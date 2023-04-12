@@ -1,0 +1,11 @@
+@font-face {
+  font-family: "MapleBold";
+  src: url("./Maplestory_OTF_Bold.woff") format("woff");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "MapleLight";
+  src: url("./Maplestory_OTF_Light.woff") format("woff");
+  font-display: swap;
+}

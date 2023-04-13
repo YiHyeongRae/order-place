@@ -3,16 +3,22 @@ import styled from "styled-components";
 import Header from "./Header";
 
 const LayoutWrap = styled.div`
-  max-width: 375px;
+  max-width: 750px;
   margin: 0 auto;
+  border-left: 1px solid #efefef;
+  border-right: 1px solid #efefef;
+  min-height: 100vh;
 `;
 
+const ChildrenWrap = styled.div`
+  padding: 32px 16px;
+`;
 interface Props extends PropsWithChildren {}
 function Layout(props: Props) {
   return (
     <LayoutWrap>
       <Header />
-      <div>{props.children}</div>
+      <ChildrenWrap>{props.children}</ChildrenWrap>
     </LayoutWrap>
   );
 }

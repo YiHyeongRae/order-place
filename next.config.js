@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
-  comiler: {
-    styledComonents: true,
+  compiler: {
+    styledComponents: true,
   },
 };
 

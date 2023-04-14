@@ -125,6 +125,13 @@ export default function Home() {
   };
 
   console.log(toDo);
+
+  const orderComplete: Function = () => {
+    // 선택한 대상 주문완료로 처리
+    // 선택한 대상 id , new Date(), 갯수, 가격 보내기
+    // new Date()는 통계 + 재발주 평균일자 계산 후 안내 메세지를 위함
+    setToDo([]);
+  };
   return (
     <>
       {toDo && toDo.length !== 0 ? (
@@ -138,7 +145,7 @@ export default function Home() {
               gap: "8px",
             }}
           >
-            <PopupContent color="pink">
+            <PopupContent color="pink" onClick={() => orderComplete()}>
               <p>주문</p>
               <p style={{ cursor: "pointer", height: 16 }}>
                 <svg

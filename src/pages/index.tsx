@@ -3,6 +3,9 @@ import styled from "styled-components";
 
 const Content = styled.div`
   font-size: 14px;
+  padding: 10px;
+  margin-bottom: 16px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
 `;
 
 const CheckWrap = styled.ul`
@@ -101,6 +104,7 @@ const PopupContent = styled.div`
   border-radius: 30px 0 0 30px;
   cursor: pointer;
 `;
+
 export default function Home() {
   const testArr = [
     "서울)우유",

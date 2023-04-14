@@ -1,8 +1,5 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 
 const Content = styled.div`
   font-size: 14px;
@@ -46,10 +43,7 @@ const ToDoItem = styled.li`
   border-radius: 10px;
   border: 1px solid #fdec;
   cursor: pointer;
-  &::after {
-    content: "${(props: any) => (props.content ? props.content : "")}";
-    display: block;
-  }
+  background-color: ${(props) => props.color};
 `;
 const Title = styled.h2`
   display: flex;
@@ -85,6 +79,7 @@ const CateItem = styled.li`
   padding: 8px 16px;
   border-radius: 10px;
   border: 1px solid #fdec;
+  cursor: pointer;
 `;
 
 const PopupWrap = styled.div`
@@ -104,9 +99,26 @@ const PopupContent = styled.div`
   max-width: 70px;
   color: #fff;
   border-radius: 30px 0 0 30px;
+  cursor: pointer;
 `;
 export default function Home() {
-  const testArr = ["서울)우유", "서울)생크림", "서울)무염버터"];
+  const testArr = [
+    "서울)우유",
+    "서울)생크림",
+    "서울)무염버터",
+    "서울)우유",
+    "서울)생크림",
+    "서울)무염버터",
+    "서울)우유",
+    "서울)생크림",
+    "서울)무염버터",
+    "서울)우유",
+    "서울)생크림",
+    "서울)무염버터",
+    "서울)우유",
+    "서울)생크림",
+    "서울)무염버터",
+  ];
 
   const testArr2 = ["컵홀더", "1호박스/판", "스티커", "2호박스/판"];
 
@@ -301,7 +313,11 @@ export default function Home() {
         <ToDoWrap>
           {testArr2.map((item, i: number) => {
             return (
-              <ToDoItem key={i} onClick={() => toDoHandler(i)}>
+              <ToDoItem
+                key={i}
+                onClick={() => toDoHandler(i)}
+                color={toDo.includes(i) ? "#fdec" : ""}
+              >
                 <p>{item}</p>
               </ToDoItem>
             );
@@ -409,7 +425,7 @@ export default function Home() {
                 d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
               />
             </svg>
-            <p>Cake</p>
+            <p>Cake&amp;Cookie</p>
           </SubTitle>
 
           <CateWrap>
@@ -435,7 +451,7 @@ export default function Home() {
               />
             </svg>
 
-            <p>Box</p>
+            <p>Bowl&amp;Box</p>
           </SubTitle>
           <CateWrap>
             <CateItem>1호박스/판</CateItem>
@@ -460,7 +476,7 @@ export default function Home() {
               />
             </svg>
 
-            <p>Drink</p>
+            <p>Drink&amp;Coffee</p>
           </SubTitle>
           <CateWrap>
             <CateItem>자몽농축액</CateItem>

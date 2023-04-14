@@ -69,14 +69,12 @@ const SubContent = styled.div`
 const CateWrap = styled.ul`
   display: flex;
   margin: 10px 0;
-
   gap: 8px;
   flex-wrap: wrap;
 `;
 
 const CateItem = styled.li`
   display: flex;
-
   flex-direction: column;
   align-items: center;
   padding: 8px 16px;
@@ -105,7 +103,8 @@ const PopupContent = styled.div`
   cursor: pointer;
 `;
 
-export default function Home() {
+export default function Home({ CCC, CDC, CBB }: any) {
+  console.log("client", CCC, CDC, CBB);
   const testArr = [
     "서울)우유",
     "서울)생크림",
@@ -433,9 +432,10 @@ export default function Home() {
           </SubTitle>
 
           <CateWrap>
-            {testArr.map((item, i) => {
-              return <CateItem key={i}>{item}</CateItem>;
-            })}
+            {CCC &&
+              CCC.map((item: any, i: number) => {
+                return <CateItem key={i}>{item.name}</CateItem>;
+              })}
           </CateWrap>
         </SubContent>
         <SubContent>
@@ -458,9 +458,10 @@ export default function Home() {
             <p>Bowl&amp;Box</p>
           </SubTitle>
           <CateWrap>
-            <CateItem>1호박스/판</CateItem>
-            <CateItem>2호박스/판</CateItem>
-            <CateItem>보틀용기</CateItem>
+            {CBB &&
+              CBB.map((item: any, i: number) => {
+                return <CateItem key={i}>{item.name}</CateItem>;
+              })}
           </CateWrap>
         </SubContent>
         <SubContent>
@@ -483,9 +484,10 @@ export default function Home() {
             <p>Drink&amp;Coffee</p>
           </SubTitle>
           <CateWrap>
-            <CateItem>자몽농축액</CateItem>
-            <CateItem>레몬농축액</CateItem>
-            <CateItem>자몽</CateItem>
+            {CDC &&
+              CDC.map((item: any, i: number) => {
+                return <CateItem key={i}>{item.name}</CateItem>;
+              })}
           </CateWrap>
         </SubContent>
       </Content>
@@ -558,3 +560,20 @@ export default function Home() {
     </>
   );
 }
+
+export const getServerSideProps = async (context: any) => {
+  const category = await fetch(
+    "http://localhost:3000/api/category/getCategory"
+  );
+  const data = await JSON.parse(await category.text());
+  const copyData = [...data];
+  const CCC = copyData.filter((item: any) => item.category === "CCC");
+  const CDC = copyData.filter((item: any) => item.category === "CDC");
+
+  const CBB = copyData.filter((item: any) => item.category === "CBB");
+
+  // console.log("category +++++++", data, "+++++++++++");
+  return {
+    props: { CCC: CCC, CDC: CDC, CBB: CBB },
+  };
+};

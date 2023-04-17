@@ -103,28 +103,40 @@ const PopupContent = styled.div`
   cursor: pointer;
 `;
 
-export default function Home({ CCC, CDC, CBB }: any) {
-  console.log("client", CCC, CDC, CBB);
-  const testArr = [
-    "서울)우유",
-    "서울)생크림",
-    "서울)무염버터",
-    "서울)우유",
-    "서울)생크림",
-    "서울)무염버터",
-    "서울)우유",
-    "서울)생크림",
-    "서울)무염버터",
-    "서울)우유",
-    "서울)생크림",
-    "서울)무염버터",
-    "서울)우유",
-    "서울)생크림",
-    "서울)무염버터",
-  ];
+const AddPopupWrap = styled.div`
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 16px 32px;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+`;
 
+const AddPopupContent = styled.div``;
+
+const InputWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 10px 0;
+`;
+
+const InputArea = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+const TextInput = styled.input`
+  border: 0;
+  background: none;
+  outline: none;
+`;
+
+const AddCateList = styled.li`
+  text-align: center;
+`;
+export default function Home({ CCC, CDC, CBB, Category }: any) {
   const testArr2 = ["컵홀더", "1호박스/판", "스티커", "2호박스/판"];
-
   const [toDo, setToDo] = useState<number[]>([]);
 
   const toDoHandler: Function = (i: number) => {
@@ -139,16 +151,39 @@ export default function Home({ CCC, CDC, CBB }: any) {
     }
   };
 
-  console.log(toDo);
-
   const orderComplete: Function = () => {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
     // new Date()는 통계 + 재발주 평균일자 계산 후 안내 메세지를 위함
     setToDo([]);
   };
+
   return (
     <>
+      <AddPopupWrap>
+        <AddPopupContent>
+          <Title>Add Category</Title>
+          <InputWrap>
+            <InputArea>
+              <label>Name</label>
+              <TextInput type="text" />
+            </InputArea>
+            <InputArea>
+              <label>Price</label>
+              <TextInput type="text" />
+            </InputArea>
+            <InputArea>
+              <p>Cate</p>
+              <ul style={{ flex: "1 1 50%" }}>
+                {Category &&
+                  Category.map((item: any, i: number) => {
+                    return <AddCateList key={i}>{item}</AddCateList>;
+                  })}
+              </ul>
+            </InputArea>
+          </InputWrap>
+        </AddPopupContent>
+      </AddPopupWrap>
       {toDo && toDo.length !== 0 ? (
         <PopupWrap>
           <div
@@ -394,23 +429,39 @@ export default function Home({ CCC, CDC, CBB }: any) {
         </div> */}
       </Content>
       <Content>
-        <Title>
+        <Title style={{ justifyContent: "space-between" }}>
+          <div style={{ display: "flex" }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={1.5}
+              stroke="currentColor"
+              style={{ width: "20px" }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              />
+            </svg>
+
+            <p>Category</p>
+          </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            style={{ width: "20px" }}
+            style={{ width: "20px", cursor: "pointer" }}
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"
+              d="M12 4.5v15m7.5-7.5h-15"
             />
           </svg>
-
-          <p>Category</p>
         </Title>
         <SubContent>
           <SubTitle>
@@ -567,13 +618,21 @@ export const getServerSideProps = async (context: any) => {
   );
   const data = await JSON.parse(await category.text());
   const copyData = [...data];
+
+  const cateSort: String[] = [];
+
+  copyData.map((item: any) => {
+    if (!cateSort.includes(item.category)) {
+      cateSort.push(item.category);
+    }
+  });
+  console.log("카테고리 잘 분류도미 ?", cateSort);
   const CCC = copyData.filter((item: any) => item.category === "CCC");
   const CDC = copyData.filter((item: any) => item.category === "CDC");
-
   const CBB = copyData.filter((item: any) => item.category === "CBB");
 
   // console.log("category +++++++", data, "+++++++++++");
   return {
-    props: { CCC: CCC, CDC: CDC, CBB: CBB },
+    props: { CCC: CCC, CDC: CDC, CBB: CBB, Category: cateSort },
   };
 };

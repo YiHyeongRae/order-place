@@ -135,7 +135,8 @@ const TextInput = styled.input`
 const AddCateList = styled.li`
   text-align: center;
 `;
-export default function Home({ CCC, CDC, CBB, Category }: any) {
+export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
+  console.log(ToDo);
   const testArr2 = ["컵홀더", "1호박스/판", "스티커", "2호박스/판"];
   const [toDo, setToDo] = useState<number[]>([]);
 
@@ -160,7 +161,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
 
   return (
     <>
-      <AddPopupWrap>
+      {/* <AddPopupWrap>
         <AddPopupContent>
           <Title>Add Category</Title>
           <InputWrap>
@@ -183,7 +184,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
             </InputArea>
           </InputWrap>
         </AddPopupContent>
-      </AddPopupWrap>
+      </AddPopupWrap> */}
       {toDo && toDo.length !== 0 ? (
         <PopupWrap>
           <div
@@ -349,17 +350,18 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
           </div>
         </Title>
         <ToDoWrap>
-          {testArr2.map((item, i: number) => {
-            return (
-              <ToDoItem
-                key={i}
-                onClick={() => toDoHandler(i)}
-                color={toDo.includes(i) ? "#fdec" : ""}
-              >
-                <p>{item}</p>
-              </ToDoItem>
-            );
-          })}
+          {ToDo &&
+            ToDo.map((item: any, i: number) => {
+              return (
+                <ToDoItem
+                  key={i}
+                  onClick={() => toDoHandler(i)}
+                  color={toDo.includes(i) ? "#fdec" : ""}
+                >
+                  <p>{item.name}</p>
+                </ToDoItem>
+              );
+            })}
         </ToDoWrap>
         {/* <div
           style={{
@@ -630,9 +632,10 @@ export const getServerSideProps = async (context: any) => {
   const CCC = copyData.filter((item: any) => item.category === "CCC");
   const CDC = copyData.filter((item: any) => item.category === "CDC");
   const CBB = copyData.filter((item: any) => item.category === "CBB");
-
-  // console.log("category +++++++", data, "+++++++++++");
+  const getToDo = await fetch("http://localhost:3000/api/todo/getToDo");
+  const ToDo = await JSON.parse(await getToDo.text());
+  // console.log("category +++++++", getToDo, "+++++++++++");
   return {
-    props: { CCC: CCC, CDC: CDC, CBB: CBB, Category: cateSort },
+    props: { CCC: CCC, CDC: CDC, CBB: CBB, Category: cateSort, ToDo: ToDo },
   };
 };

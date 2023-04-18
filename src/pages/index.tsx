@@ -1,6 +1,10 @@
-import React, { useRef, useState } from "react";
+import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
+import useSWR from "swr";
+import { mutate } from "swr";
 
+import { fetcher } from "../../util/fetcher";
 const Content = styled.div`
   font-size: 14px;
   padding: 10px;
@@ -39,7 +43,7 @@ const ToDoWrap = styled.ul`
 
 const ToDoItem = styled.li`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
@@ -83,10 +87,17 @@ const CateItem = styled.li`
   cursor: pointer;
 `;
 
-const PopupWrap = styled.div`
+const PopupRightWrap = styled.div`
   position: fixed;
   top: 50%;
   right: 0;
+  transform: translate(0, -50%);
+`;
+
+const PopupLeftWrap = styled.div`
+  position: fixed;
+  top: 50%;
+  left: 0;
   transform: translate(0, -50%);
 `;
 
@@ -104,6 +115,8 @@ const PopupContent = styled.div`
 `;
 
 const AddPopupWrap = styled.div`
+  max-width: 343px;
+  width: 100%;
   position: fixed;
   left: 50%;
   top: 50%;
@@ -130,20 +143,47 @@ const TextInput = styled.input`
   border: 0;
   background: none;
   outline: none;
+  width: 100%;
 `;
 
 const AddCateList = styled.li`
   text-align: center;
 `;
-export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
-  console.log(ToDo);
-  const testArr2 = ["컵홀더", "1호박스/판", "스티커", "2호박스/판"];
-  const [toDo, setToDo] = useState<number[]>([]);
 
+const ButtonWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+`;
+
+const Buttons = styled.button`
+  border: 0;
+  background-color: #fff;
+  border: 1px solid #eee;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 10px;
+`;
+
+interface PickTypes {
+  name: string;
+  quantity: string;
+  price: string;
+}
+
+export default function Home({ CCC, CDC, CBB, Category }: any) {
+  // console.log(ToDo);
+
+  const [loading, setLoading] = useState(false);
+  const [toDo, setToDo] = useState<number[]>([]);
+  const [addToDoState, setAddToDoState] = useState(false);
   const toDoHandler: Function = (i: number) => {
+    setCate([]);
+    console.log(i);
     const toDoCopy = [...toDo];
     if (toDo.includes(i)) {
-      console.log(1);
       const filtering = toDoCopy.filter((item: number) => item !== i);
       setToDo(filtering);
     } else {
@@ -151,6 +191,10 @@ export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
       setToDo(toDoCopy);
     }
   };
+  const { data, mutate } = useSWR(
+    "http://localhost:3000/api/todo/getToDo",
+    fetcher
+  );
 
   const orderComplete: Function = () => {
     // 선택한 대상 주문완료로 처리
@@ -159,8 +203,94 @@ export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
     setToDo([]);
   };
 
+  const [cate, setCate] = useState<string[]>([]);
+  const selectCategory: Function = (name: string) => {
+    setToDo([]);
+    const copyCate = [...cate];
+    if (!copyCate.includes(name)) {
+      copyCate.push(name);
+      setCate(copyCate);
+    } else {
+      const filtering = copyCate.filter((item: any) => item !== name);
+      setCate(filtering);
+    }
+  };
+
+  const [pick, setPick] = useState<Array<PickTypes>>([]);
+
+  const pickHandler: Function = (
+    index: number,
+    { name, quantity, price }: PickTypes
+  ) => {
+    const copyPick = [...pick];
+    // console.log("index,qt", index, quantity);
+    // copyPick[index].name = name;
+
+    // console.log("왜여기서 오류나지", copyPick);
+    quantity && (copyPick[index].quantity = quantity);
+
+    price && (copyPick[index].price = price);
+
+    setPick(copyPick);
+  };
+
+  const addToDoHandler: Function = async () => {
+    const makePick: Array<PickTypes> = [];
+    cate.map((item) => {
+      makePick.push({ name: item, quantity: "", price: "" });
+    });
+
+    setPick(makePick);
+    setAddToDoState(true);
+  };
+
+  const submitAddToDo: Function = async () => {
+    const response = await axios.post(
+      "http://localhost:3000/api/todo/addToDo",
+      { data: pick }
+    );
+    console.log(response);
+    mutate();
+
+    if (response.status === 200) {
+      setAddToDoState(false);
+      setCate([]);
+    }
+  };
+
   return (
     <>
+      {cate && cate.length !== 0 ? (
+        <PopupLeftWrap>
+          <PopupContent
+            color="pink"
+            style={{ maxWidth: "unset", borderRadius: "0 30px 30px 0" }}
+            onClick={() => {
+              addToDoHandler();
+            }}
+          >
+            <p>장바구니</p>
+            <p style={{ cursor: "pointer", height: 16 }}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                style={{ width: "16px", color: "#fff" }}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                />
+              </svg>
+            </p>
+          </PopupContent>
+        </PopupLeftWrap>
+      ) : (
+        <></>
+      )}
       {/* <AddPopupWrap>
         <AddPopupContent>
           <Title>Add Category</Title>
@@ -185,8 +315,73 @@ export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
           </InputWrap>
         </AddPopupContent>
       </AddPopupWrap> */}
+
+      {addToDoState && (
+        <AddPopupWrap>
+          <AddPopupContent>
+            {/* <Title>Cart</Title> */}
+            <InputWrap style={{ gap: "8px" }}>
+              <InputArea
+                style={{ borderBottom: "1px solid #eee", paddingBottom: "8px" }}
+              >
+                <div style={{ flex: "1 1 50%" }}>Name</div>
+                <div style={{ flex: "1 1 25%" }}>Quantity</div>
+                <div style={{ flex: "1 1 25%", textAlign: "right" }}>Price</div>
+              </InputArea>
+              {cate &&
+                cate.map((item: any, i: number) => {
+                  return (
+                    <InputArea key={i}>
+                      <div style={{ flex: "1 1 50%" }}>{item}</div>
+                      <div style={{ flex: "1 1 25%" }}>
+                        <TextInput
+                          type="text"
+                          style={{
+                            textAlign: "right",
+                          }}
+                          placeholder="수량"
+                          onChange={(e) =>
+                            pickHandler(i, {
+                              quantity: e.currentTarget.value,
+                            })
+                          }
+                        />
+                      </div>
+                      <div style={{ flex: "1 1 25%" }}>
+                        <TextInput
+                          type="text"
+                          style={{
+                            textAlign: "right",
+                          }}
+                          placeholder="가격"
+                          onChange={(e) =>
+                            pickHandler(i, {
+                              price: e.currentTarget.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </InputArea>
+                  );
+                })}
+            </InputWrap>
+            <ButtonWrap>
+              <Buttons type="button" onClick={() => submitAddToDo()}>
+                Add To Do
+              </Buttons>
+              <Buttons
+                type="button"
+                onClick={() => setAddToDoState(!addToDoState)}
+              >
+                Cancle
+              </Buttons>
+            </ButtonWrap>
+          </AddPopupContent>
+        </AddPopupWrap>
+      )}
+
       {toDo && toDo.length !== 0 ? (
-        <PopupWrap>
+        <PopupRightWrap>
           <div
             style={{
               display: "flex",
@@ -235,7 +430,7 @@ export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
               </p>
             </PopupContent>
           </div>
-        </PopupWrap>
+        </PopupRightWrap>
       ) : (
         <></>
       )}
@@ -349,86 +544,48 @@ export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
             <p>To Do Order</p>
           </div>
         </Title>
+
         <ToDoWrap>
-          {ToDo &&
-            ToDo.map((item: any, i: number) => {
+          {data === undefined || data.length === 0 ? (
+            <li style={{ textAlign: "center", width: "100%" }}>
+              할 일 목록이 없습니다!
+            </li>
+          ) : (
+            data &&
+            data.map((item: any, i: number) => {
               return (
                 <ToDoItem
                   key={i}
                   onClick={() => toDoHandler(i)}
                   color={toDo.includes(i) ? "#fdec" : ""}
                 >
-                  <p>{item.name}</p>
+                  <p>{item.name}</p>&nbsp;<p>{item.quantity}개</p>
+                  {item.link && (
+                    <a
+                      href="javascript:void(0)"
+                      style={{ display: "block", height: 14, marginLeft: 8 }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        style={{ width: 14, color: "#000" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                        />
+                      </svg>
+                    </a>
+                  )}
                 </ToDoItem>
               );
-            })}
+            })
+          )}
         </ToDoWrap>
-        {/* <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            marginLeft: "8px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              padding: "6px 10px",
-              border: "1px solid #fdec",
-            }}
-          >
-            <p>주문완료</p>
-            <p style={{ cursor: "pointer", height: 14 }}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                style={{ width: "14px", color: "black" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 12.75l6 6 9-13.5"
-                />
-              </svg>
-            </p>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              padding: "6px 10px",
-              border: "1px solid #fdec",
-            }}
-          >
-            <p>삭제하기</p>
-            <p style={{ cursor: "pointer", height: 14 }}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                style={{ width: "14px", color: "black" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
-                />
-              </svg>
-            </p>
-          </div>
-        </div> */}
       </Content>
       <Content>
         <Title style={{ justifyContent: "space-between" }}>
@@ -487,7 +644,21 @@ export default function Home({ CCC, CDC, CBB, Category, ToDo }: any) {
           <CateWrap>
             {CCC &&
               CCC.map((item: any, i: number) => {
-                return <CateItem key={i}>{item.name}</CateItem>;
+                return (
+                  <CateItem
+                    key={i}
+                    onClick={() => {
+                      selectCategory(item.name);
+                    }}
+                    style={{
+                      backgroundColor: cate.includes(item.name)
+                        ? "#ff0"
+                        : "#fff",
+                    }}
+                  >
+                    {item.name}
+                  </CateItem>
+                );
               })}
           </CateWrap>
         </SubContent>
@@ -628,14 +799,22 @@ export const getServerSideProps = async (context: any) => {
       cateSort.push(item.category);
     }
   });
-  console.log("카테고리 잘 분류도미 ?", cateSort);
+  // console.log("카테고리 잘 분류도미 ?", cateSort);
   const CCC = copyData.filter((item: any) => item.category === "CCC");
   const CDC = copyData.filter((item: any) => item.category === "CDC");
   const CBB = copyData.filter((item: any) => item.category === "CBB");
-  const getToDo = await fetch("http://localhost:3000/api/todo/getToDo");
-  const ToDo = await JSON.parse(await getToDo.text());
+  const getToDo = await fetcher("http://localhost:3000/api/todo/getToDo");
+  // console.log("겟투두", getToDo);
+  const toDoData = getToDo.data;
   // console.log("category +++++++", getToDo, "+++++++++++");
   return {
-    props: { CCC: CCC, CDC: CDC, CBB: CBB, Category: cateSort, ToDo: ToDo },
+    props: {
+      CCC: CCC,
+      CDC: CDC,
+      CBB: CBB,
+      Category: cateSort,
+      // ToDo: ToDo,
+      // fallback: { [`http://localhost:3000/api/todo/getToDo`]: toDoData },
+    },
   };
 };

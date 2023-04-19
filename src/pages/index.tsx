@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { mutate } from "swr";
 
 import { fetcher } from "../../util/fetcher";
+import getTodayDate from "../../util/getTodayDate";
 const Content = styled.div`
   font-size: 14px;
   padding: 10px;
@@ -181,7 +182,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
   const [addToDoState, setAddToDoState] = useState(false);
   const toDoHandler: Function = (i: number) => {
     setCate([]);
-    console.log(i);
+
     const toDoCopy = [...toDo];
     if (toDo.includes(i)) {
       const filtering = toDoCopy.filter((item: number) => item !== i);
@@ -196,13 +197,49 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
     fetcher
   );
 
-  const orderComplete: Function = () => {
+  const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
     // new Date()는 통계 + 재발주 평균일자 계산 후 안내 메세지를 위함
-    setToDo([]);
+
+    const selected: any[] = [];
+    const numbers: any[] = [];
+    toDo.map((index) => {
+      selected.push(data[index]);
+    });
+    toDo.map((index) => {
+      numbers.push(`"${data[index].no}"`);
+    });
+
+    const date = getTodayDate();
+
+    const registHistory = await axios
+      .post("http://localhost:3000/api/todo/historyToDo", {
+        data: selected,
+        date: date,
+      })
+      .then(async () => {
+        const deleteToDo = await axios.post(
+          "http://localhost:3000/api/todo/deleteToDo",
+          { data: numbers.toString() }
+        );
+        mutate();
+        setToDo([]);
+      });
   };
 
+  const orderDelete: Function = async () => {
+    const numbers: any[] = [];
+    toDo.map((index) => {
+      numbers.push(`"${data[index].no}"`);
+    });
+    const deleteToDo = await axios.post(
+      "http://localhost:3000/api/todo/deleteToDo",
+      { data: numbers.toString() }
+    );
+    mutate();
+    setToDo([]);
+  };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
     setToDo([]);
@@ -258,8 +295,19 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
     }
   };
 
+  // ToDo 삭제
+  // ToDo 주문완료 및 HISTORY
+
   return (
     <>
+      {/* <AddPopupWrap>
+        <p>주문완료 하시겠습니까?</p>
+        <p>할 일 목록에서 제거하시겠습니까?</p>
+        <ButtonWrap>
+          <Buttons type="button">확인</Buttons>
+          <Buttons type="button">취소</Buttons>
+        </ButtonWrap>
+      </AddPopupWrap> */}
       {cate && cate.length !== 0 ? (
         <PopupLeftWrap>
           <PopupContent
@@ -684,7 +732,21 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
           <CateWrap>
             {CBB &&
               CBB.map((item: any, i: number) => {
-                return <CateItem key={i}>{item.name}</CateItem>;
+                return (
+                  <CateItem
+                    key={i}
+                    onClick={() => {
+                      selectCategory(item.name);
+                    }}
+                    style={{
+                      backgroundColor: cate.includes(item.name)
+                        ? "#ff0"
+                        : "#fff",
+                    }}
+                  >
+                    {item.name}
+                  </CateItem>
+                );
               })}
           </CateWrap>
         </SubContent>
@@ -710,7 +772,21 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
           <CateWrap>
             {CDC &&
               CDC.map((item: any, i: number) => {
-                return <CateItem key={i}>{item.name}</CateItem>;
+                return (
+                  <CateItem
+                    key={i}
+                    onClick={() => {
+                      selectCategory(item.name);
+                    }}
+                    style={{
+                      backgroundColor: cate.includes(item.name)
+                        ? "#ff0"
+                        : "#fff",
+                    }}
+                  >
+                    {item.name}
+                  </CateItem>
+                );
               })}
           </CateWrap>
         </SubContent>

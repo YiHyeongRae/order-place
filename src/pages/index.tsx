@@ -219,12 +219,16 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
         date: date,
       })
       .then(async () => {
-        const deleteToDo = await axios.post(
-          "http://localhost:3000/api/todo/deleteToDo",
-          { data: numbers.toString() }
-        );
-        mutate();
+        const deleteToDo = await axios
+          .post("http://localhost:3000/api/todo/deleteToDo", {
+            data: numbers.toString(),
+          })
+          .then(() => {
+            mutate();
+          });
+
         setToDo([]);
+        setConfirmState(0);
       });
   };
 
@@ -233,12 +237,16 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
     toDo.map((index) => {
       numbers.push(`"${data[index].no}"`);
     });
-    const deleteToDo = await axios.post(
-      "http://localhost:3000/api/todo/deleteToDo",
-      { data: numbers.toString() }
-    );
-    mutate();
+    const deleteToDo = await axios
+      .post("http://localhost:3000/api/todo/deleteToDo", {
+        data: numbers.toString(),
+      })
+      .then(() => {
+        mutate();
+      });
+
     setToDo([]);
+    setConfirmState(0);
   };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
@@ -297,17 +305,39 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
 
   // ToDo 삭제
   // ToDo 주문완료 및 HISTORY
+  const [confirmState, setConfirmState] = useState(0);
 
+  const confirmFunc: Function = () => {
+    if (confirmState === 1) {
+      orderComplete();
+    } else if (confirmState === 2) {
+      orderDelete();
+    }
+  };
   return (
     <>
-      {/* <AddPopupWrap>
-        <p>주문완료 하시겠습니까?</p>
-        <p>할 일 목록에서 제거하시겠습니까?</p>
-        <ButtonWrap>
-          <Buttons type="button">확인</Buttons>
-          <Buttons type="button">취소</Buttons>
-        </ButtonWrap>
-      </AddPopupWrap> */}
+      {confirmState !== 0 && (
+        <AddPopupWrap style={{ zIndex: 1 }}>
+          <Title>Confirm</Title>
+          <div style={{ padding: "16px 0" }}>
+            {confirmState === 1 ? (
+              <p>주문완료 하시겠습니까?</p>
+            ) : (
+              <p>할 일 목록에서 제거하시겠습니까?</p>
+            )}
+          </div>
+
+          <ButtonWrap>
+            <Buttons type="button" onClick={() => confirmFunc()}>
+              확인
+            </Buttons>
+            <Buttons type="button" onClick={() => setConfirmState(0)}>
+              취소
+            </Buttons>
+          </ButtonWrap>
+        </AddPopupWrap>
+      )}
+
       {cate && cate.length !== 0 ? (
         <PopupLeftWrap>
           <PopupContent
@@ -439,7 +469,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
               gap: "8px",
             }}
           >
-            <PopupContent color="pink" onClick={() => orderComplete()}>
+            <PopupContent color="pink" onClick={() => setConfirmState(1)}>
               <p>주문</p>
               <p style={{ cursor: "pointer", height: 16 }}>
                 <svg
@@ -458,7 +488,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
                 </svg>
               </p>
             </PopupContent>
-            <PopupContent color="#f55353">
+            <PopupContent color="#f55353" onClick={() => setConfirmState(2)}>
               <p>삭제</p>
               <p style={{ cursor: "pointer", height: 16 }}>
                 <svg

@@ -174,7 +174,7 @@ interface PickTypes {
   price: string;
 }
 
-export default function Home({ CCC, CDC, CBB, Category }: any) {
+export default function Home({ CCC, CDC, CBB, Category, History }: any) {
   // console.log(ToDo);
 
   const [loading, setLoading] = useState(false);
@@ -314,6 +314,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
       orderDelete();
     }
   };
+  console.log(History);
   return (
     <>
       {confirmState !== 0 && (
@@ -369,30 +370,6 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
       ) : (
         <></>
       )}
-      {/* <AddPopupWrap>
-        <AddPopupContent>
-          <Title>Add Category</Title>
-          <InputWrap>
-            <InputArea>
-              <label>Name</label>
-              <TextInput type="text" />
-            </InputArea>
-            <InputArea>
-              <label>Price</label>
-              <TextInput type="text" />
-            </InputArea>
-            <InputArea>
-              <p>Cate</p>
-              <ul style={{ flex: "1 1 50%" }}>
-                {Category &&
-                  Category.map((item: any, i: number) => {
-                    return <AddCateList key={i}>{item}</AddCateList>;
-                  })}
-              </ul>
-            </InputArea>
-          </InputWrap>
-        </AddPopupContent>
-      </AddPopupWrap> */}
 
       {addToDoState && (
         <AddPopupWrap>
@@ -532,23 +509,13 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
 
           <p>Check</p>
         </Title>
+
         <CheckWrap>
-          <CheckItem>
+          <li style={{ textAlign: "center" }}>
+            통계 데이터가 쌓일 때 까지 조금만 기다려주세요!
+          </li>
+          {/* <CheckItem>
             <CheckMarker>
-              {/* <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                style={{ width: "20px", color: "red" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                />
-              </svg> */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -583,7 +550,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
+                  d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"
                 />
               </svg>
             </CheckMarker>
@@ -592,7 +559,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
               &quot;서울)생크림&quot; 을 발주하신지 14일이 지났어요!
               발주&amp;재고 확인을 추천드립니다!
             </p>
-          </CheckItem>
+          </CheckItem> */}
         </CheckWrap>
       </Content>
       <Content>
@@ -730,7 +697,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
                     }}
                     style={{
                       backgroundColor: cate.includes(item.name)
-                        ? "#ff0"
+                        ? "#fdec"
                         : "#fff",
                     }}
                   >
@@ -770,7 +737,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
                     }}
                     style={{
                       backgroundColor: cate.includes(item.name)
-                        ? "#ff0"
+                        ? "#fdec"
                         : "#fff",
                     }}
                   >
@@ -810,7 +777,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
                     }}
                     style={{
                       backgroundColor: cate.includes(item.name)
-                        ? "#ff0"
+                        ? "#fdec"
                         : "#fff",
                     }}
                   >
@@ -841,50 +808,21 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
           <p>Latest Order</p>
         </Title>
         <CheckWrap>
-          <CheckItem style={{ justifyContent: "space-between" }}>
-            {/* <CheckMarker>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                style={{ width: "20px", color: "red" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                />
-              </svg>
-            </CheckMarker> */}
-
-            <p>2023-04-12</p>
-            <p>서울)생크림 3개</p>
-            <p>20,000 원</p>
-          </CheckItem>
-          <CheckItem style={{ justifyContent: "space-between" }}>
-            {/* <CheckMarker>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                style={{ width: "20px", color: "red" }}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                />
-              </svg>
-            </CheckMarker> */}
-
-            <p>2023-04-12</p>
-            <p>컵홀더 1개</p>
-            <p>10,000 원</p>
-          </CheckItem>
+          {History && History.length === 0 ? (
+            <li style={{ textAlign: "center", width: "100%" }}>
+              최근 주문 내역이 없습니다!
+            </li>
+          ) : (
+            History.map((item: any, i: any) => {
+              return (
+                <CheckItem style={{ justifyContent: "space-between" }} key={i}>
+                  <p>{item.order_date}</p>
+                  <p>{`${item.name} ${item.quantity}개`}</p>
+                  <p>{`${item.price} 원`}</p>
+                </CheckItem>
+              );
+            })
+          )}
         </CheckWrap>
       </Content>
     </>
@@ -909,9 +847,13 @@ export const getServerSideProps = async (context: any) => {
   const CCC = copyData.filter((item: any) => item.category === "CCC");
   const CDC = copyData.filter((item: any) => item.category === "CDC");
   const CBB = copyData.filter((item: any) => item.category === "CBB");
-  const getToDo = await fetcher("http://localhost:3000/api/todo/getToDo");
+  const getHistory = await fetch(
+    "http://localhost:3000/api/history/getHistory"
+  );
+  const history = await JSON.parse(await getHistory.text());
+  console.log(history);
   // console.log("겟투두", getToDo);
-  const toDoData = getToDo.data;
+
   // console.log("category +++++++", getToDo, "+++++++++++");
   return {
     props: {
@@ -919,8 +861,7 @@ export const getServerSideProps = async (context: any) => {
       CDC: CDC,
       CBB: CBB,
       Category: cateSort,
-      // ToDo: ToDo,
-      // fallback: { [`http://localhost:3000/api/todo/getToDo`]: toDoData },
+      History: history,
     },
   };
 };

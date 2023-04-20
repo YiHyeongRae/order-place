@@ -15,6 +15,46 @@ placePath=%3Fentry=pll%26from=nx%26fromNxList=true&c=15,0,0,0,dh">사랑방 [네
 </div>
 
 
+#
+
+### FrontEnd
+<div style="display:flex;">
+
+<img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=Next.js&logoColor=fff"/>
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=TypeScript&logoColor=fff"/>
+<img src="https://img.shields.io/badge/styledcomponents-DB7093?style=for-the-badge&logo=styled-components&logoColor=fff"/>
+
+<img src="https://img.shields.io/badge/Axios-5a29e4?style=for-the-badge&logo=Axios&logoColor=fff"/> with SWR
+</div>
+  
+#
+  
+### BackEnd
+<div style="display:flex">
+<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=Node.js&logoColor=fff"/>
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=fff"/>
+<img src="https://img.shields.io/badge/AmazonAWS-232F3E?style=for-the-badge&logo=AmazonAWS&logoColor=fff"/>
+<img src="https://img.shields.io/badge/AmazonRDS-527FFF?style=for-the-badge&logo=AmazonRDS&logoColor=fff"/>
+</div>
+
+#
+
+### Deploy
+<div style="display:flex;">
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=Vercel&logoColor=fff"/>
+</div>
+
+#
+
+### Environment
+<div style="display:flex;">
+<img src="https://img.shields.io/badge/VisualStudioCode-007ACC?style=for-the-badge&logo=VisualStudioCode&logoColor=fff"/>
+<img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=fff"/>
+<img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=fff"/>
+</div>
+
+#
+
 
 <h2>주요 기능</h2>
 <ul>

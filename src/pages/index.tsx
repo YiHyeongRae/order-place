@@ -1,13 +1,12 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import useSWR from "swr";
-import { mutate } from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
 import { fetcher } from "../../util/fetcher";
 import getTodayDate from "../../util/getTodayDate";
 const Content = styled.div`
-  font-size: 14px;
+  font-size: 10px;
   padding: 10px;
   margin-bottom: 16px;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
@@ -59,10 +58,12 @@ const Title = styled.h2`
   line-height: 20px;
   padding-bottom: 8px;
   border-bottom: 1px solid #eee;
+  font-size: 14px;
 `;
 const SubTitle = styled.h3`
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  font-size: 12px;
 `;
 const SubContent = styled.div`
   margin: 20px 0;
@@ -174,9 +175,9 @@ interface PickTypes {
   price: string;
 }
 
-export default function Home({ CCC, CDC, CBB, Category, History }: any) {
+export default function Home({ CCC, CDC, CBB, Category }: any) {
   // console.log(ToDo);
-
+  const { mutate } = useSWRConfig();
   const [loading, setLoading] = useState(false);
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
@@ -192,11 +193,14 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
       setToDo(toDoCopy);
     }
   };
-  const { data, mutate } = useSWR(
+  const { data: toDoData } = useSWR(
     "http://localhost:3000/api/todo/getToDo",
     fetcher
   );
-
+  const { data: history } = useSWR(
+    "http://localhost:3000/api/history/getHistory",
+    fetcher
+  );
   const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
@@ -205,10 +209,10 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
     const selected: any[] = [];
     const numbers: any[] = [];
     toDo.map((index) => {
-      selected.push(data[index]);
+      selected.push(toDoData[index]);
     });
     toDo.map((index) => {
-      numbers.push(`"${data[index].no}"`);
+      numbers.push(`"${toDoData[index].no}"`);
     });
 
     const date = getTodayDate();
@@ -224,7 +228,8 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
             data: numbers.toString(),
           })
           .then(() => {
-            mutate();
+            mutate("http://localhost:3000/api/todo/getToDo"),
+              mutate("http://localhost:3000/api/history/getHistory");
           });
 
         setToDo([]);
@@ -235,14 +240,14 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
   const orderDelete: Function = async () => {
     const numbers: any[] = [];
     toDo.map((index) => {
-      numbers.push(`"${data[index].no}"`);
+      numbers.push(`"${toDoData[index].no}"`);
     });
     const deleteToDo = await axios
       .post("http://localhost:3000/api/todo/deleteToDo", {
         data: numbers.toString(),
       })
       .then(() => {
-        mutate();
+        mutate("http://localhost:3000/api/todo/getToDo");
       });
 
     setToDo([]);
@@ -295,7 +300,7 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
       { data: pick }
     );
     console.log(response);
-    mutate();
+    mutate("http://localhost:3000/api/todo/getToDo");
 
     if (response.status === 200) {
       setAddToDoState(false);
@@ -314,7 +319,7 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
       orderDelete();
     }
   };
-  console.log(History);
+  console.log(history);
   return (
     <>
       {confirmState !== 0 && (
@@ -498,7 +503,7 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            style={{ width: "20px", color: "pink" }}
+            style={{ width: "20px", color: "#000" }}
           >
             <path
               strokeLinecap="round"
@@ -514,7 +519,7 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
           <li style={{ textAlign: "center" }}>
             통계 데이터가 쌓일 때 까지 조금만 기다려주세요!
           </li>
-          {/* <CheckItem>
+          <CheckItem>
             <CheckMarker>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -559,7 +564,7 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
               &quot;서울)생크림&quot; 을 발주하신지 14일이 지났어요!
               발주&amp;재고 확인을 추천드립니다!
             </p>
-          </CheckItem> */}
+          </CheckItem>
         </CheckWrap>
       </Content>
       <Content>
@@ -573,11 +578,11 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              fill="pink"
+              fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              style={{ width: "20px", color: "pink" }}
+              style={{ width: "20px", color: "#000" }}
             >
               <path
                 strokeLinecap="round"
@@ -591,13 +596,13 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
         </Title>
 
         <ToDoWrap>
-          {data === undefined || data.length === 0 ? (
+          {toDoData === undefined || toDoData.length === 0 ? (
             <li style={{ textAlign: "center", width: "100%" }}>
               할 일 목록이 없습니다!
             </li>
           ) : (
-            data &&
-            data.map((item: any, i: number) => {
+            toDoData &&
+            toDoData.map((item: any, i: number) => {
               return (
                 <ToDoItem
                   key={i}
@@ -808,17 +813,24 @@ export default function Home({ CCC, CDC, CBB, Category, History }: any) {
           <p>Latest Order</p>
         </Title>
         <CheckWrap>
-          {History && History.length === 0 ? (
+          {history && history.length === 0 ? (
             <li style={{ textAlign: "center", width: "100%" }}>
               최근 주문 내역이 없습니다!
             </li>
           ) : (
-            History.map((item: any, i: any) => {
+            history &&
+            history.map((item: any, i: any) => {
               return (
                 <CheckItem style={{ justifyContent: "space-between" }} key={i}>
-                  <p>{item.order_date}</p>
-                  <p>{`${item.name} ${item.quantity}개`}</p>
-                  <p>{`${item.price} 원`}</p>
+                  <p style={{ flex: "1 1 25%", textAlign: "left" }}>
+                    {item.order_date}
+                  </p>
+                  <p
+                    style={{ flex: "1 1 50%", textAlign: "center" }}
+                  >{`${item.name} ${item.quantity}개`}</p>
+                  <p
+                    style={{ flex: "1 1 25%", textAlign: "right" }}
+                  >{`${item.price} 원`}</p>
                 </CheckItem>
               );
             })
@@ -847,11 +859,7 @@ export const getServerSideProps = async (context: any) => {
   const CCC = copyData.filter((item: any) => item.category === "CCC");
   const CDC = copyData.filter((item: any) => item.category === "CDC");
   const CBB = copyData.filter((item: any) => item.category === "CBB");
-  const getHistory = await fetch(
-    "http://localhost:3000/api/history/getHistory"
-  );
-  const history = await JSON.parse(await getHistory.text());
-  console.log(history);
+
   // console.log("겟투두", getToDo);
 
   // console.log("category +++++++", getToDo, "+++++++++++");
@@ -861,7 +869,6 @@ export const getServerSideProps = async (context: any) => {
       CDC: CDC,
       CBB: CBB,
       Category: cateSort,
-      History: history,
     },
   };
 };

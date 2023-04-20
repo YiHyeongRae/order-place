@@ -1,5 +1,6 @@
 import React, { Component, PropsWithChildren, ReactElement } from "react";
 import styled from "styled-components";
+import Footer from "./Footer";
 import Header from "./Header";
 
 const LayoutWrap = styled.div`
@@ -19,6 +20,7 @@ function Layout(props: Props) {
     <LayoutWrap>
       <Header />
       <ChildrenWrap>{props.children}</ChildrenWrap>
+      <Footer />
     </LayoutWrap>
   );
 }

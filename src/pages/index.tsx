@@ -519,7 +519,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
           <li style={{ textAlign: "center" }}>
             통계 데이터가 쌓일 때 까지 조금만 기다려주세요!
           </li>
-          <CheckItem>
+          {/* <CheckItem>
             <CheckMarker>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -564,7 +564,7 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
               &quot;서울)생크림&quot; 을 발주하신지 14일이 지났어요!
               발주&amp;재고 확인을 추천드립니다!
             </p>
-          </CheckItem>
+          </CheckItem> */}
         </CheckWrap>
       </Content>
       <Content>

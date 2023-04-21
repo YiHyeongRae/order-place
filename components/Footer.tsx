@@ -6,7 +6,7 @@ const FooterWrap = styled.div`
   border-top: 1px solid #efefef;
   padding: 8px 0;
   text-align: center;
-  font-size: 14px;
+  font-size: 10px;
 `;
 function Footer() {
   return (

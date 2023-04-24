@@ -19,25 +19,38 @@ export const authOptions = {
       // The name to display on the sign in form (e.g. "Sign in with...")
       id: "login",
       name: "login",
+      type: "credentials",
       // `credentials` is used to generate a form on the sign in page.
       // You can specify which fields should be submitted, by adding keys to the `credentials` object.
       // e.g. domain, username, password, 2FA token, etc.
       // You can pass any HTML attribute to the <input> tag through the object.
-      credentials: {},
-      async authorize(req: any) {
-        // console.log("credentials,req", req);
+      credentials: {
+        username: {
+          label: "id",
+          type: "text",
+        },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials: any, req: any) {
         // Add logic here to look up the user from the credentials supplied
 
         const res = await axios.post("http://localhost:3000/api/user/login", {
-          data: { id: req.userId, pw: req.hashedPw },
+          data: { id: credentials.userId, pw: credentials.hashedPw },
         });
-        console.log("nextAuth", res.data);
+        // console.log("nextAuth", res.data.user_id, res.data.name, res.data);
+        const category = res.data[0].category.split("|");
+        console.log("category", category);
+        const user = { id: res.data[0].user_id, name: res.data[0].name };
 
-        if (res.data.length === 0) {
-          return null;
-        } else {
-          const user = { id: res.data.user_id, name: res.data.name };
+        if (user) {
+          // Any object returned will be saved in `user` property of the JWT
+          console.log("???ADSf", user);
           return user;
+        } else {
+          // If you return null then an error will be displayed advising the user to check their details.
+          return null;
+
+          // You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
         }
       },
     }),

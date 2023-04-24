@@ -19,6 +19,7 @@ const CircleButtons = styled.button`
   border: 1px solid #eee;
   background-color: #fff;
   padding: 8px 16px;
+  cursor: pointer;
 `;
 
 const LoginForm = styled.form`
@@ -52,7 +53,6 @@ function Login() {
   const [userPw, setUserPw] = useState<string>();
   const { data: session } = useSession();
   // console.log("id,pw", userId, userPw);
-  console.log("session", session);
 
   const login: Function = async () => {
     const hashedPw = await Hash.makeHash(userId, userPw)
@@ -60,13 +60,22 @@ function Login() {
         signIn("login", { userId, hashedPw, redirect: false })
       )
       .then((result: any) => {
-        console.log("result", result);
         if (result.status === 200) {
-          router.replace("/");
+          router.push("/");
         } else {
           alert("아이디 혹은 비밀번호가 틀렸습니다.");
         }
       });
+  };
+
+  const enterTheLogin: Function = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      userId !== "" && userPw !== ""
+        ? login()
+        : alert("아이디 또는 비밀번호를 입력해주세요.");
+    }
   };
   return (
     <LoginWrap>
@@ -78,6 +87,7 @@ function Login() {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setUserId(e.currentTarget.value)
           }
+          onKeyDown={(e) => enterTheLogin(e)}
         />
 
         <Inputs
@@ -86,10 +96,14 @@ function Login() {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setUserPw(e.currentTarget.value)
           }
+          onKeyDown={(e) => enterTheLogin(e)}
         />
 
         <ButtonWrap>
-          <CircleButtons type="button" onClick={() => login()}>
+          <CircleButtons
+            type="button"
+            onClick={() => (userId !== "" && userPw !== "" ? login() : {})}
+          >
             로그인
           </CircleButtons>
         </ButtonWrap>

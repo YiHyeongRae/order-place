@@ -215,11 +215,11 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
   };
 
   const { data: toDoData } = useSWR(
-    "http://localhost:3000/api/todo/getToDo",
+    process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo",
     (url) => fetcher(url, { id: user })
   );
   const { data: history } = useSWR(
-    "http://localhost:3000/api/history/getHistory",
+    process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
     (url) => fetcher(url, { id: user })
   );
   const orderComplete: Function = async () => {
@@ -239,18 +239,20 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
     const date = getTodayDate();
 
     const registHistory = await axios
-      .post("http://localhost:3000/api/todo/historyToDo", {
+      .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/historyToDo", {
         data: selected,
         date: date,
       })
       .then(async () => {
         const deleteToDo = await axios
-          .post("http://localhost:3000/api/todo/deleteToDo", {
+          .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/deleteToDo", {
             data: numbers.toString(),
           })
           .then(() => {
-            mutate("http://localhost:3000/api/todo/getToDo"),
-              mutate("http://localhost:3000/api/history/getHistory");
+            mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo"),
+              mutate(
+                process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory"
+              );
           });
 
         setToDo([]);
@@ -264,11 +266,11 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
       numbers.push(`"${toDoData[index].no}"`);
     });
     const deleteToDo = await axios
-      .post("http://localhost:3000/api/todo/deleteToDo", {
+      .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/deleteToDo", {
         data: numbers.toString(),
       })
       .then(() => {
-        mutate("http://localhost:3000/api/todo/getToDo");
+        mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
       });
 
     setToDo([]);
@@ -317,11 +319,11 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
 
   const submitAddToDo: Function = async () => {
     const response = await axios.post(
-      "http://localhost:3000/api/todo/addToDo",
+      process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/addToDo",
       { data: pick }
     );
     console.log(response);
-    mutate("http://localhost:3000/api/todo/getToDo");
+    mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
 
     if (response.status === 200) {
       setAddToDoState(false);
@@ -357,10 +359,10 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
 
   const deleteLatestOrder: Function = async () => {
     const response = await axios.post(
-      "http://localhost:3000/api/history/deleteHistory",
+      process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/deleteHistory",
       { data: latestOrder }
     );
-    mutate("http://localhost:3000/api/history/getHistory");
+    mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory");
   };
 
   return (
@@ -927,7 +929,7 @@ export const getServerSideProps = async (context: any) => {
     };
   }
   const category = await axios.post(
-    "http://localhost:3000/api/category/getCategory",
+    process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
     { id: session.token.sub }
   );
   // console.log("category", category.data);

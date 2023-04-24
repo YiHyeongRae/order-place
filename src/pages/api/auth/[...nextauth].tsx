@@ -34,9 +34,12 @@ export const authOptions = {
       async authorize(credentials: any, req: any) {
         // Add logic here to look up the user from the credentials supplied
 
-        const res = await axios.post("http://localhost:3000/api/user/login", {
-          data: { id: credentials.userId, pw: credentials.hashedPw },
-        });
+        const res = await axios.post(
+          process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/user/login",
+          {
+            data: { id: credentials.userId, pw: credentials.hashedPw },
+          }
+        );
         // console.log("nextAuth", res.data.user_id, res.data.name, res.data);
         const category = res.data[0].category.split("|");
         console.log("category", category);

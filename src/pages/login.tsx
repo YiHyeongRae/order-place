@@ -5,6 +5,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { redirect } from "next/dist/server/api-utils";
 import Hash from "../../util/Hash";
 import { useRouter } from "next/router";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 const LoginWrap = styled.div`
   display: flex;
@@ -51,19 +52,20 @@ function Login() {
   const router = useRouter();
   const [userId, setUserId] = useState<string>();
   const [userPw, setUserPw] = useState<string>();
-  const { data: session } = useSession();
-  // console.log("id,pw", userId, userPw);
-
+  const [isLoading, setIsLoading] = useState(false);
   const login: Function = async () => {
+    setIsLoading(true);
     const hashedPw = await Hash.makeHash(userId, userPw)
       .then((hashedPw: string) =>
         signIn("login", { userId, hashedPw, redirect: false })
       )
       .then((result: any) => {
         if (result.status === 200) {
+          setIsLoading(false);
           router.push("/");
         } else {
           alert("아이디 혹은 비밀번호가 틀렸습니다.");
+          setIsLoading(false);
         }
       });
   };
@@ -79,36 +81,42 @@ function Login() {
   };
   return (
     <LoginWrap>
-      <div>LOGIN</div>
-      <LoginForm>
-        <Inputs
-          type="text"
-          placeholder="ID"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUserId(e.currentTarget.value)
-          }
-          onKeyDown={(e) => enterTheLogin(e)}
-        />
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <div>LOGIN</div>
+          <LoginForm>
+            <Inputs
+              type="text"
+              placeholder="ID"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setUserId(e.currentTarget.value)
+              }
+              onKeyDown={(e) => enterTheLogin(e)}
+            />
 
-        <Inputs
-          type="password"
-          placeholder="PASSWORD"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUserPw(e.currentTarget.value)
-          }
-          onKeyDown={(e) => enterTheLogin(e)}
-        />
+            <Inputs
+              type="password"
+              placeholder="PASSWORD"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setUserPw(e.currentTarget.value)
+              }
+              onKeyDown={(e) => enterTheLogin(e)}
+            />
 
-        <ButtonWrap>
-          <CircleButtons
-            type="button"
-            onClick={() => (userId !== "" && userPw !== "" ? login() : {})}
-          >
-            로그인
-          </CircleButtons>
-        </ButtonWrap>
-      </LoginForm>
-      <div>회원가입은 관리자에게 문의해주세요.</div>
+            <ButtonWrap>
+              <CircleButtons
+                type="button"
+                onClick={() => (userId !== "" && userPw !== "" ? login() : {})}
+              >
+                로그인
+              </CircleButtons>
+            </ButtonWrap>
+          </LoginForm>
+          <div>회원가입은 관리자에게 문의해주세요.</div>
+        </>
+      )}
     </LoginWrap>
   );
 }

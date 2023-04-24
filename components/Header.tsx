@@ -25,7 +25,7 @@ const LogOut = styled.div`
   cursor: pointer;
 `;
 function Header() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   // console.log("header session", session);
   const router = useRouter();
   const logout: Function = () => {
@@ -37,6 +37,8 @@ function Header() {
       router.push("/login");
     }
   };
+
+  console.log(status);
   return (
     <HeaderWrap>
       <Logo>OrderPlace</Logo>
@@ -56,7 +58,7 @@ function Header() {
           />
         </svg>
       </p> */}
-      {session === null ? (
+      {status === "loading" || status === "unauthenticated" ? (
         <></>
       ) : (
         <LogOut onClick={() => logout()}>Logout</LogOut>

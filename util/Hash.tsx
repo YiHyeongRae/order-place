@@ -7,11 +7,11 @@ interface HashModuels {
 }
 const Hash: HashModuels = {
   makeHash: async (userId: string, userPw: string) => {
-    console.log("hash에 들어오는 id", userId);
+    // console.log("hash에 들어오는 id", userId);
     const res = await axios.post("http://localhost:3000/api/user/getSalt", {
       id: userId,
     });
-    console.log("hash res", res);
+    // console.log("hash res", res);
     const stretching = 1000;
     if (res.data.length !== 0) {
       const salt = res.data[0].salt;

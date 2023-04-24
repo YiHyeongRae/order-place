@@ -38,7 +38,7 @@ function Header() {
     }
   };
 
-  console.log(status);
+  console.log(router);
   return (
     <HeaderWrap>
       <Logo>OrderPlace</Logo>
@@ -58,7 +58,8 @@ function Header() {
           />
         </svg>
       </p> */}
-      {status === "loading" || status === "unauthenticated" ? (
+      {(status === "loading" || status === "unauthenticated") &&
+      router.asPath !== "/" ? (
         <></>
       ) : (
         <LogOut onClick={() => logout()}>Logout</LogOut>

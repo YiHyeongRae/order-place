@@ -1,10 +1,13 @@
 import axios from "axios";
+import { getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR, { useSWRConfig } from "swr";
 
 import { fetcher } from "../../util/fetcher";
 import getTodayDate from "../../util/getTodayDate";
+import { authOptions } from "./api/auth/[...nextauth]";
 const Content = styled.div`
   font-size: 10px;
   padding: 10px;
@@ -175,8 +178,12 @@ interface PickTypes {
   price: string;
 }
 
-export default function Home({ CCC, CDC, CBB, Category }: any) {
-  // console.log(ToDo);
+Home.defaultProps = {
+  auth: true,
+};
+
+export default function Home({ CCC, CDC, CBB, Category, user }: any) {
+  const session = useSession();
   const { mutate } = useSWRConfig();
   const [loading, setLoading] = useState(false);
   const [toDo, setToDo] = useState<number[]>([]);
@@ -193,13 +200,14 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
       setToDo(toDoCopy);
     }
   };
+
   const { data: toDoData } = useSWR(
     "http://localhost:3000/api/todo/getToDo",
-    fetcher
+    (url) => fetcher(url, { id: user })
   );
   const { data: history } = useSWR(
     "http://localhost:3000/api/history/getHistory",
-    fetcher
+    (url) => fetcher(url, { id: user })
   );
   const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
@@ -319,7 +327,6 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
       orderDelete();
     }
   };
-  console.log(history);
   return (
     <>
       {confirmState !== 0 && (
@@ -842,11 +849,24 @@ export default function Home({ CCC, CDC, CBB, Category }: any) {
 }
 
 export const getServerSideProps = async (context: any) => {
-  const category = await fetch(
-    "http://localhost:3000/api/category/getCategory"
+  const session = await getServerSession(context.req, context.res, authOptions);
+
+  // session 없을 시 로그인 페이지 이동
+  if (session === null) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+  const category = await axios.post(
+    "http://localhost:3000/api/category/getCategory",
+    { id: session.token.sub }
   );
-  const data = await JSON.parse(await category.text());
-  const copyData = [...data];
+  // console.log("category", category.data);
+  // const data = await JSON.parse(category.data);
+  const copyData = [...category.data];
 
   const cateSort: String[] = [];
 
@@ -868,6 +888,7 @@ export const getServerSideProps = async (context: any) => {
       CCC: CCC,
       CDC: CDC,
       CBB: CBB,
+      user: session.token.sub,
       Category: cateSort,
     },
   };

@@ -61,8 +61,8 @@ function Login() {
       )
       .then((result: any) => {
         if (result.status === 200) {
-          setIsLoading(false);
           router.push("/");
+          setIsLoading(false);
         } else {
           alert("아이디 혹은 비밀번호가 틀렸습니다.");
           setIsLoading(false);

@@ -1,3 +1,5 @@
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import React from "react";
 import styled from "styled-components";
 
@@ -7,6 +9,7 @@ const HeaderWrap = styled.div`
   align-items: center;
   padding: 8px 16px;
   border-bottom: 1px solid #efefef;
+  position: relative;
 `;
 
 const Logo = styled.h1`
@@ -14,8 +17,26 @@ const Logo = styled.h1`
   font-family: "MapleBold";
   cursor: pointer;
 `;
-
+const LogOut = styled.div`
+  position: absolute;
+  right: 16px;
+  top: 11px;
+  font-size: 10px;
+  cursor: pointer;
+`;
 function Header() {
+  const { data: session } = useSession();
+  // console.log("header session", session);
+  const router = useRouter();
+  const logout: Function = () => {
+    const confirms = confirm("로그아웃 하시겠습니까?");
+    // console.log(confirms);
+
+    if (confirms) {
+      signOut();
+      router.push("/login");
+    }
+  };
   return (
     <HeaderWrap>
       <Logo>OrderPlace</Logo>
@@ -35,6 +56,11 @@ function Header() {
           />
         </svg>
       </p> */}
+      {session === null ? (
+        <></>
+      ) : (
+        <LogOut onClick={() => logout()}>Logout</LogOut>
+      )}
     </HeaderWrap>
   );
 }

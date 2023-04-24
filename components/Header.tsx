@@ -58,8 +58,7 @@ function Header() {
           />
         </svg>
       </p> */}
-      {(status === "loading" || status === "unauthenticated") &&
-      router.asPath !== "/" ? (
+      {router.asPath !== "/" ? (
         <></>
       ) : (
         <LogOut onClick={() => logout()}>Logout</LogOut>

@@ -5,13 +5,17 @@ export default async function getCategory(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  db.query(`SELECT * FROM op_category`, function (err: any, result: any) {
-    if (err) {
-      // console.log("에러는 ?", err);
-      res.send(err);
-    } else {
-      // console.log("결과는 ?", result);
-      res.json(result);
+  // console.log("getCategory REQ", req);
+  db.query(
+    `SELECT * FROM op_category WHERE user_id="${req.body.id}"`,
+    function (err: any, result: any) {
+      if (err) {
+        // console.log("에러는 ?", err);
+        res.send(err);
+      } else {
+        // console.log("결과는 ?", result);
+        res.json(result);
+      }
     }
-  });
+  );
 }

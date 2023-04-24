@@ -7,6 +7,7 @@ import useSWR, { useSWRConfig } from "swr";
 
 import { fetcher } from "../../util/fetcher";
 import getTodayDate from "../../util/getTodayDate";
+
 import { authOptions } from "./api/auth/[...nextauth]";
 const Content = styled.div`
   font-size: 10px;
@@ -70,6 +71,8 @@ const SubTitle = styled.h3`
 `;
 const SubContent = styled.div`
   margin: 20px 0;
+  /* margin-top: 20px; */
+
   /* margin-left: 20px; */
   /* padding: 8px 16px;
   border-radius: 10px;
@@ -78,8 +81,9 @@ const SubContent = styled.div`
 const CateWrap = styled.ul`
   display: flex;
   margin: 10px 0;
-  gap: 8px;
   flex-wrap: wrap;
+
+  gap: 8px;
 `;
 
 const CateItem = styled.li`
@@ -97,6 +101,7 @@ const PopupRightWrap = styled.div`
   top: 50%;
   right: 0;
   transform: translate(0, -50%);
+  cursor: pointer;
 `;
 
 const PopupLeftWrap = styled.div`
@@ -104,6 +109,14 @@ const PopupLeftWrap = styled.div`
   top: 50%;
   left: 0;
   transform: translate(0, -50%);
+  cursor: pointer;
+`;
+const PopupLeftBottom = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  cursor: pointer;
 `;
 
 const PopupContent = styled.div`
@@ -327,8 +340,47 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
       orderDelete();
     }
   };
+
+  const [latestOrder, setLatestOrder] = useState<number[]>([]);
+
+  const latestOrderHandler: Function = (index: number) => {
+    const copyArr = [...latestOrder];
+
+    if (!copyArr.includes(index)) {
+      copyArr.push(index);
+      setLatestOrder(copyArr);
+    } else {
+      const filter = copyArr.filter((item) => item !== index);
+      setLatestOrder(filter);
+    }
+  };
+
+  const deleteLatestOrder: Function = async () => {
+    const response = await axios.post(
+      "http://localhost:3000/api/history/deleteHistory",
+      { data: latestOrder }
+    );
+    mutate("http://localhost:3000/api/history/getHistory");
+  };
+
   return (
     <>
+      {latestOrder.length !== 0 && (
+        <PopupLeftBottom onClick={() => deleteLatestOrder()}>
+          <div
+            style={{
+              backgroundColor: "#f55353",
+              color: "#fff",
+              borderRadius: "30px 30px 0 0",
+              padding: "6px 10px",
+            }}
+          >
+            최근 주문 내역 삭제하기
+          </div>
+        </PopupLeftBottom>
+      )}
+
+      {/* 주문완료 및 삭제 확인 팝업 */}
       {confirmState !== 0 && (
         <AddPopupWrap style={{ zIndex: 1 }}>
           <Title>Confirm</Title>
@@ -350,7 +402,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           </ButtonWrap>
         </AddPopupWrap>
       )}
-
+      {/* ToDo 장바구니 Left  */}
       {cate && cate.length !== 0 ? (
         <PopupLeftWrap>
           <PopupContent
@@ -383,6 +435,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
         <></>
       )}
 
+      {/* ToDo 장바구니 팝업 (수량,가격 입력) */}
       {addToDoState && (
         <AddPopupWrap>
           <AddPopupContent>
@@ -446,7 +499,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           </AddPopupContent>
         </AddPopupWrap>
       )}
-
+      {/* ToDo 주문/삭제 Right */}
       {toDo && toDo.length !== 0 ? (
         <PopupRightWrap>
           <div
@@ -501,7 +554,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
       ) : (
         <></>
       )}
-
+      {/* Check */}
       <Content>
         <Title>
           <svg
@@ -574,6 +627,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           </CheckItem> */}
         </CheckWrap>
       </Content>
+      {/* ToDo */}
       <Content>
         <Title>
           <div
@@ -644,6 +698,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           )}
         </ToDoWrap>
       </Content>
+      {/* Category */}
       <Content>
         <Title style={{ justifyContent: "space-between" }}>
           <div style={{ display: "flex" }}>
@@ -800,6 +855,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           </CateWrap>
         </SubContent>
       </Content>
+      {/* Latest Order */}
       <Content>
         <Title>
           <svg
@@ -828,7 +884,17 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
             history &&
             history.map((item: any, i: any) => {
               return (
-                <CheckItem style={{ justifyContent: "space-between" }} key={i}>
+                <CheckItem
+                  style={{
+                    cursor: "pointer",
+                    justifyContent: "space-between",
+                    backgroundColor: latestOrder.includes(item.no)
+                      ? "#fdec"
+                      : "#fff",
+                  }}
+                  key={i}
+                  onClick={() => latestOrderHandler(item.no)}
+                >
                   <p style={{ flex: "1 1 25%", textAlign: "left" }}>
                     {item.order_date}
                   </p>

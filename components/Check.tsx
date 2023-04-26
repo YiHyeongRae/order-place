@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Content = styled.div`
@@ -44,7 +44,6 @@ interface CheckResultTypes {
   expect_date: string;
 }
 function Check({ data }: any) {
-  console.log("data", data);
   // const testArr = [
   //   { name: "꿀", quantity: "1", order_date: "2023-03-21" },
   //   { name: "꿀", quantity: "1", order_date: "2023-03-24" },
@@ -69,89 +68,94 @@ function Check({ data }: any) {
   // 분류 나누기
 
   // sortingName === 꿀,컵홀더,서울)생크림
-  const sortingName: string[] = [];
+  const [resultData, setResultData] = useState<any[]>([]);
+  const checkHandler: Function = () => {
+    const sortingName: string[] = [];
 
-  const sortingArr: any = [];
-  data &&
-    data.map((item: any) => {
-      if (!sortingName.includes(item.name)) {
-        sortingName.push(item.name);
+    const sortingArr: any = [];
+
+    data &&
+      data.map((item: any) => {
+        if (!sortingName.includes(item.name)) {
+          sortingName.push(item.name);
+        }
+      });
+
+    for (let i = 0; i < sortingName.length; i++) {
+      const filter = data.filter((item: any) => item.name === sortingName[i]);
+      sortingArr.push(filter);
+    }
+
+    // for (let i=0; i<sortingArr.length; i++){
+    //   for(let ii=0; ii<sortingArr[i].length; i++){
+    //     sortingArr[i].map(()=>{})
+    //   }
+    // }
+    const getDateDiff = (d1: string, d2: string) => {
+      const date1 = new Date(d1);
+      const date2 = new Date(d2);
+
+      const diffDate = date1.getTime() - date2.getTime();
+
+      return Math.abs(diffDate / (1000 * 60 * 60 * 24)); // 밀리세컨 * 초 * 분 * 시 = 일
+    };
+
+    const mnfArr: any = [];
+    sortingArr.map((item: any) => {
+      if (item.length > 2) {
+        let testObj = {
+          name: item[0].name,
+          order_date_avg: 0,
+          last_quantity: 0,
+          last_order_date: item[item.length - 1].order_date,
+          order_expect_date: "",
+        };
+        let total_quantity = 0;
+        for (let i = 0; i < item.length - 1; i++) {
+          total_quantity = total_quantity + Number(item[i].quantity);
+        }
+
+        testObj.order_date_avg = Math.floor(
+          getDateDiff(item[0].order_date, item[item.length - 1].order_date) /
+            total_quantity
+        );
+        testObj.last_quantity = Number(item[item.length - 1].quantity);
+        mnfArr.push(testObj);
+        // console.log(
+        //   "?ASD?FSA?F",
+        //   item[item.length - 1].order_date,
+        //   testObj.avg * item[item.length - 1].quantity
+        // );
+
+        const lastOrder = new Date(item[item.length - 1].order_date);
+        // console.log(
+        //   "마지막 주문일, 예상 다음 발주까지의 일수",
+        //   lastOrder,
+        //   testObj.avg * item[item.length - 1].quantity
+        // );
+        const expectDate = new Date(
+          lastOrder.setDate(
+            lastOrder.getDate() + testObj.order_date_avg * testObj.last_quantity
+          )
+        );
+
+        const Years = expectDate.getFullYear();
+        const Months = expectDate.getMonth() + 1;
+        const Days = expectDate.getDate();
+
+        const resultDate = `${Years}-${Months < 10 ? `0${Months}` : Months}-${
+          Days < 10 ? `0${Days}` : Days
+        }`;
+
+        testObj.order_expect_date = resultDate;
+        // console.log("이건가", resultDate);
+        // testObj.expect_date =expectDate
       }
     });
 
-  for (let i = 0; i < sortingName.length; i++) {
-    const filter = data.filter((item: any) => item.name === sortingName[i]);
-    sortingArr.push(filter);
-  }
-
-  // for (let i=0; i<sortingArr.length; i++){
-  //   for(let ii=0; ii<sortingArr[i].length; i++){
-  //     sortingArr[i].map(()=>{})
-  //   }
-  // }
-  const getDateDiff = (d1: string, d2: string) => {
-    const date1 = new Date(d1);
-    const date2 = new Date(d2);
-
-    const diffDate = date1.getTime() - date2.getTime();
-
-    return Math.abs(diffDate / (1000 * 60 * 60 * 24)); // 밀리세컨 * 초 * 분 * 시 = 일
+    setResultData(mnfArr);
   };
 
-  const mnfArr: any = [];
-  sortingArr.map((item: any) => {
-    if (item.length > 2) {
-      let testObj = {
-        name: item[0].name,
-        order_date_avg: 0,
-        last_quantity: 0,
-        last_order_date: item[item.length - 1].order_date,
-        order_expect_date: "",
-      };
-      let total_quantity = 0;
-      for (let i = 0; i < item.length - 1; i++) {
-        total_quantity = total_quantity + Number(item[i].quantity);
-      }
-
-      testObj.order_date_avg = Math.floor(
-        getDateDiff(item[0].order_date, item[item.length - 1].order_date) /
-          total_quantity
-      );
-      testObj.last_quantity = Number(item[item.length - 1].quantity);
-      console.log("??", item, item[item.length - 1].order_date);
-      mnfArr.push(testObj);
-      // console.log(
-      //   "?ASD?FSA?F",
-      //   item[item.length - 1].order_date,
-      //   testObj.avg * item[item.length - 1].quantity
-      // );
-
-      const lastOrder = new Date(item[item.length - 1].order_date);
-      // console.log(
-      //   "마지막 주문일, 예상 다음 발주까지의 일수",
-      //   lastOrder,
-      //   testObj.avg * item[item.length - 1].quantity
-      // );
-      const expectDate = new Date(
-        lastOrder.setDate(
-          lastOrder.getDate() + testObj.order_date_avg * testObj.last_quantity
-        )
-      );
-
-      const Years = expectDate.getFullYear();
-      const Months = expectDate.getMonth() + 1;
-      const Days = expectDate.getDate();
-
-      const resultDate = `${Years}-${Months < 10 ? `0${Months}` : Months}-${
-        Days < 10 ? `0${Days}` : Days
-      }`;
-
-      testObj.order_expect_date = resultDate;
-      // console.log("이건가", resultDate);
-      // testObj.expect_date =expectDate
-    }
-  });
-  console.log(mnfArr);
   const today = new Date();
   const Years = today.getFullYear();
   const Months = today.getMonth() + 1;
@@ -160,6 +164,10 @@ function Check({ data }: any) {
   const resultToday = `${Years}-${Months < 10 ? `0${Months}` : Months}-${
     Days < 10 ? `0${Days}` : Days
   }`;
+
+  useEffect(() => {
+    checkHandler();
+  }, []);
   return (
     <Content>
       <Title>
@@ -182,13 +190,13 @@ function Check({ data }: any) {
       </Title>
 
       <CheckWrap>
-        {mnfArr.filter((item: any) => resultToday > item.order_expect_date)
+        {resultData.filter((item: any) => resultToday > item.order_expect_date)
           .length === 0 ? (
           <li style={{ textAlign: "center" }}>
             통계 데이터가 부족하거나 발주&amp;재고 데이터 알림이 없습니다!
           </li>
         ) : (
-          mnfArr.map((item: any, i: number) => {
+          resultData.map((item: any, i: number) => {
             const today = new Date();
             const Years = today.getFullYear();
             const Months = today.getMonth() + 1;

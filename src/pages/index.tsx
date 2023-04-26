@@ -267,6 +267,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
     const deleteToDo = await axios
       .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/deleteToDo", {
         data: numbers.toString(),
+        user_id: user,
       })
       .then(() => {
         mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");

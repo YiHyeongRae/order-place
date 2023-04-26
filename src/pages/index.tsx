@@ -152,6 +152,7 @@ const InputWrap = styled.div`
 const InputArea = styled.div`
   display: flex;
   justify-content: space-between;
+  font-size: 14px;
 `;
 const TextInput = styled.input`
   border: 0;
@@ -302,7 +303,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
 
     setPick(copyPick);
   };
-
+  console.log(pick);
   const addToDoHandler: Function = async () => {
     const makePick: Array<PickTypes> = [];
     cate.map((item) => {
@@ -313,17 +314,28 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
     setAddToDoState(true);
   };
 
+  console.log(
+    "every 문",
+    pick.every((item: any) => item.price !== "" && item.quantity !== "")
+  );
   const submitAddToDo: Function = async () => {
-    const response = await axios.post(
-      process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/addToDo",
-      { data: pick }
+    const isFullField = pick.every(
+      (item: any) => item.price !== "" && item.quantity !== ""
     );
-    console.log(response);
-    mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
 
-    if (response.status === 200) {
-      setAddToDoState(false);
-      setCate([]);
+    if (isFullField) {
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/addToDo",
+        { data: pick }
+      );
+      mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
+
+      if (response.status === 200) {
+        setAddToDoState(false);
+        setCate([]);
+      }
+    } else {
+      alert("수량 혹은 가격을 입력해주세요.");
     }
   };
 
@@ -450,8 +462,10 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
                 cate.map((item: any, i: number) => {
                   return (
                     <InputArea key={i}>
-                      <div style={{ flex: "1 1 50%" }}>{item}</div>
-                      <div style={{ flex: "1 1 25%" }}>
+                      <div style={{ flex: "1 1 50%", fontSize: 12 }}>
+                        {item}
+                      </div>
+                      <div style={{ flex: "1 1 25%", fontSize: 12 }}>
                         <TextInput
                           type="text"
                           style={{
@@ -460,12 +474,16 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
                           placeholder="수량"
                           onChange={(e) =>
                             pickHandler(i, {
-                              quantity: e.currentTarget.value,
+                              quantity: e.currentTarget.value.replace(
+                                /[^0-9]/g,
+                                ""
+                              ),
                             })
                           }
+                          value={pick[i].quantity}
                         />
                       </div>
-                      <div style={{ flex: "1 1 25%" }}>
+                      <div style={{ flex: "1 1 25%", fontSize: 12 }}>
                         <TextInput
                           type="text"
                           style={{
@@ -474,9 +492,13 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
                           placeholder="가격"
                           onChange={(e) =>
                             pickHandler(i, {
-                              price: e.currentTarget.value,
+                              price: e.currentTarget.value.replace(
+                                /[^0-9]/g,
+                                ""
+                              ),
                             })
                           }
+                          value={pick[i].price}
                         />
                       </div>
                     </InputArea>

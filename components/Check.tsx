@@ -185,7 +185,7 @@ function Check({ data }: any) {
         {mnfArr.filter((item: any) => resultToday > item.order_expect_date)
           .length === 0 ? (
           <li style={{ textAlign: "center" }}>
-            통계 데이터가 쌓일 때 까지 조금만 기다려주세요!
+            통계 데이터가 부족하거나 발주&amp;재고 데이터 알림이 없습니다!
           </li>
         ) : (
           mnfArr.map((item: any, i: number) => {
@@ -197,8 +197,6 @@ function Check({ data }: any) {
             const resultToday = `${Years}-${
               Months < 10 ? `0${Months}` : Months
             }-${Days < 10 ? `0${Days}` : Days}`;
-
-            console.log(resultToday === "2023-04-25");
 
             return (
               <CheckItem

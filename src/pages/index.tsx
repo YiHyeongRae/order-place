@@ -553,7 +553,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
         <></>
       )}
       {/* Check */}
-      <Check />
+      <Check data={history} />
       {/* ToDo */}
       <Content>
         <Title>

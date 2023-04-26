@@ -43,27 +43,28 @@ interface CheckResultTypes {
   quantity: number;
   expect_date: string;
 }
-function Check() {
-  const testArr = [
-    { name: "꿀", quantity: "1", order_date: "2023-03-21" },
-    { name: "꿀", quantity: "1", order_date: "2023-03-24" },
-    { name: "꿀", quantity: "1", order_date: "2023-03-27" },
-    { name: "꿀", quantity: "1", order_date: "2023-04-01" },
+function Check({ data }: any) {
+  console.log("data", data);
+  // const testArr = [
+  //   { name: "꿀", quantity: "1", order_date: "2023-03-21" },
+  //   { name: "꿀", quantity: "1", order_date: "2023-03-24" },
+  //   { name: "꿀", quantity: "1", order_date: "2023-03-27" },
+  //   { name: "꿀", quantity: "1", order_date: "2023-04-01" },
 
-    // 꿀은  1개당 약 7일의 텀으로 주문중이고, 마지막 주문 갯수가 2개이므로 다음 예상 주문일은 2023-05-01에서 14일 뒤
+  //   // 꿀은  1개당 약 7일의 텀으로 주문중이고, 마지막 주문 갯수가 2개이므로 다음 예상 주문일은 2023-05-01에서 14일 뒤
 
-    { name: "컵홀더", quantity: "1", order_date: "2023-03-21" },
-    { name: "컵홀더", quantity: "1", order_date: "2023-03-28" },
-    { name: "컵홀더", quantity: "1", order_date: "2023-04-05" },
+  //   { name: "컵홀더", quantity: "1", order_date: "2023-03-21" },
+  //   { name: "컵홀더", quantity: "1", order_date: "2023-03-28" },
+  //   { name: "컵홀더", quantity: "1", order_date: "2023-04-05" },
 
-    // 컵홀더는 1개당 약 7일 텀으로 주문중이고, 마지막 주문 갯수가 1개이므로 다음 예상 주문일은 2023-04-05에서 7일 뒤
+  //   // 컵홀더는 1개당 약 7일 텀으로 주문중이고, 마지막 주문 갯수가 1개이므로 다음 예상 주문일은 2023-04-05에서 7일 뒤
 
-    { name: "서울)생크림", quantity: "1", order_date: "2023-03-21" },
-    { name: "서울)생크림", quantity: "1", order_date: "2023-04-05" },
-    { name: "서울)생크림", quantity: "1", order_date: "2023-04-19" },
+  //   { name: "서울)생크림", quantity: "1", order_date: "2023-03-21" },
+  //   { name: "서울)생크림", quantity: "1", order_date: "2023-04-05" },
+  //   { name: "서울)생크림", quantity: "1", order_date: "2023-04-19" },
 
-    // 서울)생크림은 1개당 약 14일 텀으로 주문중이고, 마지막 주문 갯수가 1개이므로 다음 예상 주문일은 2023-04-19에서 14일 뒤
-  ];
+  //   // 서울)생크림은 1개당 약 14일 텀으로 주문중이고, 마지막 주문 갯수가 1개이므로 다음 예상 주문일은 2023-04-19에서 14일 뒤
+  // ];
 
   // 분류 나누기
 
@@ -71,14 +72,15 @@ function Check() {
   const sortingName: string[] = [];
 
   const sortingArr: any = [];
-  testArr.map((item) => {
-    if (!sortingName.includes(item.name)) {
-      sortingName.push(item.name);
-    }
-  });
+  data &&
+    data.map((item: any) => {
+      if (!sortingName.includes(item.name)) {
+        sortingName.push(item.name);
+      }
+    });
 
   for (let i = 0; i < sortingName.length; i++) {
-    const filter = testArr.filter((item) => item.name === sortingName[i]);
+    const filter = data.filter((item: any) => item.name === sortingName[i]);
     sortingArr.push(filter);
   }
 
@@ -116,6 +118,7 @@ function Check() {
           total_quantity
       );
       testObj.last_quantity = Number(item[item.length - 1].quantity);
+      console.log("??", item, item[item.length - 1].order_date);
       mnfArr.push(testObj);
       // console.log(
       //   "?ASD?FSA?F",
@@ -149,6 +152,14 @@ function Check() {
     }
   });
   console.log(mnfArr);
+  const today = new Date();
+  const Years = today.getFullYear();
+  const Months = today.getMonth() + 1;
+  const Days = today.getDate();
+
+  const resultToday = `${Years}-${Months < 10 ? `0${Months}` : Months}-${
+    Days < 10 ? `0${Days}` : Days
+  }`;
   return (
     <Content>
       <Title>
@@ -171,7 +182,8 @@ function Check() {
       </Title>
 
       <CheckWrap>
-        {mnfArr.length === 0 ? (
+        {mnfArr.filter((item: any) => resultToday > item.order_expect_date)
+          .length === 0 ? (
           <li style={{ textAlign: "center" }}>
             통계 데이터가 쌓일 때 까지 조금만 기다려주세요!
           </li>
@@ -187,6 +199,7 @@ function Check() {
             }-${Days < 10 ? `0${Days}` : Days}`;
 
             console.log(resultToday === "2023-04-25");
+
             return (
               <CheckItem
                 key={i}

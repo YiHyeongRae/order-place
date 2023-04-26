@@ -12,7 +12,7 @@ export default async function deleteHistory(
   });
   console.log("values", `(${values})`);
   db.query(
-    `DELETE FROM op_history WHERE no IN (${values})`,
+    `UPDATE op_history SET delete_yn="y" WHERE no IN (${values})`,
     function (err: any, result: any) {
       if (err) {
         // console.log("에러는 ?", err);

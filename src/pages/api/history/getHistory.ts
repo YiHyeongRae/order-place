@@ -6,7 +6,7 @@ export default async function getHistory(
   res: NextApiResponse
 ) {
   db.query(
-    `SELECT * FROM op_history WHERE user_id="${req.query.id}"`,
+    `SELECT * FROM op_history WHERE user_id="${req.query.id}" AND delete_yn="n"`,
     function (err: any, result: any) {
       if (err) {
         // console.log("에러는 ?", err);

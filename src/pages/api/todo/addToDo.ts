@@ -10,7 +10,7 @@ export default async function addToDo(
   const values = getInsertValues(req.body.data);
 
   db.query(
-    `INSERT INTO op_todo (name,quantity,price) VALUES${values}`,
+    `INSERT INTO op_todo (name,quantity,price,user_id) VALUES${values}`,
     function (err: any, result: any) {
       if (err) {
         // console.log("에러는 ?", err);

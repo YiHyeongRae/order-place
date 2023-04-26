@@ -186,6 +186,7 @@ interface PickTypes {
   name: string;
   quantity: string;
   price: string;
+  user_id: string;
 }
 
 Home.defaultProps = {
@@ -244,6 +245,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
         const deleteToDo = await axios
           .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/deleteToDo", {
             data: numbers.toString(),
+            user_id: user,
           })
           .then(() => {
             mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo"),
@@ -287,26 +289,22 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
   };
 
   const [pick, setPick] = useState<Array<PickTypes>>([]);
-
   const pickHandler: Function = (
     index: number,
-    { name, quantity, price }: PickTypes
+    { name, quantity, price, user_id }: PickTypes
   ) => {
     const copyPick = [...pick];
-    // console.log("index,qt", index, quantity);
-    // copyPick[index].name = name;
 
-    // console.log("왜여기서 오류나지", copyPick);
     quantity && (copyPick[index].quantity = quantity);
 
     price && (copyPick[index].price = price);
-
+    copyPick[index].user_id = user;
     setPick(copyPick);
   };
   const addToDoHandler: Function = async () => {
     const makePick: Array<PickTypes> = [];
     cate.map((item) => {
-      makePick.push({ name: item, quantity: "", price: "" });
+      makePick.push({ name: item, quantity: "", price: "", user_id: "" });
     });
 
     setPick(makePick);

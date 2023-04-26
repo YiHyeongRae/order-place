@@ -1,15 +1,15 @@
 import axios from "axios";
+import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR, { useSWRConfig } from "swr";
 import Check from "../../components/Check";
-
 import { fetcher } from "../../util/fetcher";
 import getTodayDate from "../../util/getTodayDate";
-
 import { authOptions } from "./api/auth/[...nextauth]";
+
 const Content = styled.div`
   font-size: 10px;
   padding: 10px;
@@ -41,7 +41,10 @@ const ToDoWrap = styled.ul`
   flex-wrap: wrap;
 `;
 
-const ToDoItem = styled.li`
+interface ToDoItemStyleTypes {
+  color: string;
+}
+const ToDoItem = styled.li<ToDoItemStyleTypes>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -68,7 +71,6 @@ const SubTitle = styled.h3`
 const SubContent = styled.div`
   margin: 20px 0;
   /* margin-top: 20px; */
-
   /* margin-left: 20px; */
   /* padding: 8px 16px;
   border-radius: 10px;
@@ -193,7 +195,38 @@ Home.defaultProps = {
   auth: true,
 };
 
-export default function Home({ CCC, CDC, CBB, Category, user }: any) {
+interface CategoryTypes {
+  no: number;
+  category: string;
+  id: string;
+  link: string;
+  name: string;
+  before_price: number;
+  now_price: number;
+  order_avg_dage: string;
+  user_id: string;
+}
+interface ServerSideDataTypes {
+  CCC: Array<CategoryTypes>;
+  CDC: Array<CategoryTypes>;
+  CBB: Array<CategoryTypes>;
+  user: string;
+}
+
+interface ToDoTypes {
+  no: number;
+  name: string;
+  link: string;
+  price: string;
+  quantity: string;
+  user_id: string;
+}
+
+interface HistroyTypes extends ToDoTypes {
+  order_date: string;
+  delete_yn: string;
+}
+export default function Home({ CCC, CDC, CBB, user }: ServerSideDataTypes) {
   const session = useSession();
   const { mutate } = useSWRConfig();
   const [loading, setLoading] = useState(false);
@@ -225,8 +258,8 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
     // new Date()는 통계 + 재발주 평균일자 계산 후 안내 메세지를 위함
 
-    const selected: any[] = [];
-    const numbers: any[] = [];
+    const selected: number[] = [];
+    const numbers: string[] = [];
     toDo.map((index) => {
       selected.push(toDoData[index]);
     });
@@ -258,9 +291,8 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
         setConfirmState(0);
       });
   };
-
   const orderDelete: Function = async () => {
-    const numbers: any[] = [];
+    const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
     });
@@ -284,7 +316,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
       copyCate.push(name);
       setCate(copyCate);
     } else {
-      const filtering = copyCate.filter((item: any) => item !== name);
+      const filtering = copyCate.filter((item: string) => item !== name);
       setCate(filtering);
     }
   };
@@ -314,7 +346,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
 
   const submitAddToDo: Function = async () => {
     const isFullField = pick.every(
-      (item: any) => item.price !== "" && item.quantity !== ""
+      (item: PickTypes) => item.price !== "" && item.quantity !== ""
     );
 
     if (isFullField) {
@@ -365,8 +397,8 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
       { data: latestOrder }
     );
     mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory");
+    setLatestOrder([]);
   };
-
   return (
     <>
       {latestOrder.length !== 0 && (
@@ -453,7 +485,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
                 <div style={{ flex: "1 1 25%", textAlign: "right" }}>Price</div>
               </InputArea>
               {cate &&
-                cate.map((item: any, i: number) => {
+                cate.map((item: string, i: number) => {
                   return (
                     <InputArea key={i}>
                       <div style={{ flex: "1 1 50%", fontSize: 12 }}>
@@ -606,7 +638,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
             </li>
           ) : (
             toDoData &&
-            toDoData.map((item: any, i: number) => {
+            toDoData.map((item: ToDoTypes, i: number) => {
               return (
                 <ToDoItem
                   key={i}
@@ -698,7 +730,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
 
           <CateWrap>
             {CCC &&
-              CCC.map((item: any, i: number) => {
+              CCC.map((item: CategoryTypes, i: number) => {
                 return (
                   <CateItem
                     key={i}
@@ -738,7 +770,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           </SubTitle>
           <CateWrap>
             {CBB &&
-              CBB.map((item: any, i: number) => {
+              CBB.map((item: CategoryTypes, i: number) => {
                 return (
                   <CateItem
                     key={i}
@@ -778,7 +810,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
           </SubTitle>
           <CateWrap>
             {CDC &&
-              CDC.map((item: any, i: number) => {
+              CDC.map((item: CategoryTypes, i: number) => {
                 return (
                   <CateItem
                     key={i}
@@ -825,7 +857,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
             </li>
           ) : (
             history &&
-            history.map((item: any, i: any) => {
+            history.map((item: HistroyTypes, i: number) => {
               return (
                 <CheckItem
                   style={{
@@ -857,7 +889,7 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
   );
 }
 
-export const getServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerSession(context.req, context.res, authOptions);
 
   // session 없을 시 로그인 페이지 이동
@@ -877,17 +909,17 @@ export const getServerSideProps = async (context: any) => {
   // const data = await JSON.parse(category.data);
   const copyData = [...category.data];
 
-  const cateSort: String[] = [];
+  const cateSort: string[] = [];
 
-  copyData.map((item: any) => {
+  copyData.map((item: CategoryTypes) => {
     if (!cateSort.includes(item.category)) {
       cateSort.push(item.category);
     }
   });
   // console.log("카테고리 잘 분류도미 ?", cateSort);
-  const CCC = copyData.filter((item: any) => item.category === "CCC");
-  const CDC = copyData.filter((item: any) => item.category === "CDC");
-  const CBB = copyData.filter((item: any) => item.category === "CBB");
+  const CCC = copyData.filter((item: CategoryTypes) => item.category === "CCC");
+  const CDC = copyData.filter((item: CategoryTypes) => item.category === "CDC");
+  const CBB = copyData.filter((item: CategoryTypes) => item.category === "CBB");
 
   // console.log("겟투두", getToDo);
 

@@ -303,7 +303,6 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
 
     setPick(copyPick);
   };
-  console.log(pick);
   const addToDoHandler: Function = async () => {
     const makePick: Array<PickTypes> = [];
     cate.map((item) => {
@@ -314,10 +313,6 @@ export default function Home({ CCC, CDC, CBB, Category, user }: any) {
     setAddToDoState(true);
   };
 
-  console.log(
-    "every 문",
-    pick.every((item: any) => item.price !== "" && item.quantity !== "")
-  );
   const submitAddToDo: Function = async () => {
     const isFullField = pick.every(
       (item: any) => item.price !== "" && item.quantity !== ""

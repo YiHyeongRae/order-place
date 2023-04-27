@@ -41,10 +41,10 @@ const ToDoWrap = styled.ul`
   flex-wrap: wrap;
 `;
 
-interface ToDoItemStyleTypes {
-  color: string;
+interface StylePropsTypes {
+  color?: string;
 }
-const ToDoItem = styled.li<ToDoItemStyleTypes>`
+const ToDoItem = styled.li<StylePropsTypes>`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -117,12 +117,12 @@ const PopupLeftBottom = styled.div`
   cursor: pointer;
 `;
 
-const PopupContent = styled.div`
+const PopupContent = styled.div<StylePropsTypes>`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 6px 10px;
-  background-color: ${(props: any) => props.color};
+  background-color: ${(props) => props.color};
   min-width: 70px;
   max-width: 70px;
   color: #fff;

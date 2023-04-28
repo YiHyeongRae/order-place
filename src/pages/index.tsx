@@ -161,6 +161,7 @@ const TextInput = styled.input`
   background: none;
   outline: none;
   width: 100%;
+  font-size: 12px;
 `;
 
 const AddCateList = styled.li`
@@ -207,10 +208,9 @@ interface CategoryTypes {
   user_id: string;
 }
 interface ServerSideDataTypes {
-  CCC: Array<CategoryTypes>;
-  CDC: Array<CategoryTypes>;
-  CBB: Array<CategoryTypes>;
   user: string;
+  CateName: string[];
+  Group: any;
 }
 
 interface ToDoTypes {
@@ -226,10 +226,14 @@ interface HistroyTypes extends ToDoTypes {
   order_date: string;
   delete_yn: string;
 }
-export default function Home({ CCC, CDC, CBB, user }: ServerSideDataTypes) {
-  const session = useSession();
+export default function Home({
+  user,
+  CateName,
+
+  Group,
+}: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
-  const [loading, setLoading] = useState(false);
+
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
   const toDoHandler: Function = (i: number) => {
@@ -401,6 +405,7 @@ export default function Home({ CCC, CDC, CBB, user }: ServerSideDataTypes) {
   };
   return (
     <>
+      {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (
         <PopupLeftBottom onClick={() => deleteLatestOrder()}>
           <div
@@ -415,7 +420,29 @@ export default function Home({ CCC, CDC, CBB, user }: ServerSideDataTypes) {
           </div>
         </PopupLeftBottom>
       )}
-
+      <AddPopupWrap>
+        <AddPopupContent>
+          <InputWrap style={{ gap: "8px" }}>
+            <InputArea
+              style={{ borderBottom: "1px solid #eee", paddingBottom: "8px" }}
+            >
+              <div>Name</div>
+              <div>Link</div>
+              <div>Category</div>
+            </InputArea>
+            <InputArea>
+              <TextInput type="text" placeholder="이름" />
+              <TextInput type="text" placeholder="구매 링크" />
+              <select style={{ border: 0, outline: "none" }}>
+                {CateName &&
+                  CateName.map((item: string, i: number) => {
+                    return <option key={i}>{item}</option>;
+                  })}
+              </select>
+            </InputArea>
+          </InputWrap>
+        </AddPopupContent>
+      </AddPopupWrap>
       {/* 주문완료 및 삭제 확인 팝업 */}
       {confirmState !== 0 && (
         <AddPopupWrap style={{ zIndex: 1 }}>
@@ -545,7 +572,7 @@ export default function Home({ CCC, CDC, CBB, user }: ServerSideDataTypes) {
           </AddPopupContent>
         </AddPopupWrap>
       )}
-      {/* ToDo 주문/삭제 Right */}
+      {/* ToDo 주문완료 및 삭제 Right */}
       {toDo && toDo.length !== 0 ? (
         <PopupRightWrap>
           <div
@@ -709,126 +736,51 @@ export default function Home({ CCC, CDC, CBB, user }: ServerSideDataTypes) {
             />
           </svg>
         </Title>
-        <SubContent>
-          <SubTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              style={{ width: "14px", marginBottom: "3px" }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
-              />
-            </svg>
-            <p>Cake&amp;Cookie</p>
-          </SubTitle>
-
-          <CateWrap>
-            {CCC &&
-              CCC.map((item: CategoryTypes, i: number) => {
-                return (
-                  <CateItem
-                    key={i}
-                    onClick={() => {
-                      selectCategory(item.name);
-                    }}
-                    style={{
-                      backgroundColor: cate.includes(item.name)
-                        ? "#fdec"
-                        : "#fff",
-                    }}
+        {Group &&
+          Group.map((item: any, i: number) => {
+            return (
+              <SubContent key={i}>
+                <SubTitle>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    style={{ width: "14px", marginBottom: "3px" }}
                   >
-                    {item.name}
-                  </CateItem>
-                );
-              })}
-          </CateWrap>
-        </SubContent>
-        <SubContent>
-          <SubTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              style={{ width: "14px", marginBottom: "3px" }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
-              />
-            </svg>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
+                    />
+                  </svg>
+                  <p>{item[0].category}</p>
+                </SubTitle>
 
-            <p>Bowl&amp;Box</p>
-          </SubTitle>
-          <CateWrap>
-            {CBB &&
-              CBB.map((item: CategoryTypes, i: number) => {
-                return (
-                  <CateItem
-                    key={i}
-                    onClick={() => {
-                      selectCategory(item.name);
-                    }}
-                    style={{
-                      backgroundColor: cate.includes(item.name)
-                        ? "#fdec"
-                        : "#fff",
-                    }}
-                  >
-                    {item.name}
-                  </CateItem>
-                );
-              })}
-          </CateWrap>
-        </SubContent>
-        <SubContent>
-          <SubTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              style={{ width: "14px", marginBottom: "3px" }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5.25 8.25h15m-16.5 7.5h15m-1.8-13.5l-3.9 19.5m-2.1-19.5l-3.9 19.5"
-              />
-            </svg>
-
-            <p>Drink&amp;Coffee</p>
-          </SubTitle>
-          <CateWrap>
-            {CDC &&
-              CDC.map((item: CategoryTypes, i: number) => {
-                return (
-                  <CateItem
-                    key={i}
-                    onClick={() => {
-                      selectCategory(item.name);
-                    }}
-                    style={{
-                      backgroundColor: cate.includes(item.name)
-                        ? "#fdec"
-                        : "#fff",
-                    }}
-                  >
-                    {item.name}
-                  </CateItem>
-                );
-              })}
-          </CateWrap>
-        </SubContent>
+                <CateWrap>
+                  {item &&
+                    item.map((item2: CategoryTypes, i: number) => {
+                      return (
+                        <CateItem
+                          key={i}
+                          onClick={() => {
+                            selectCategory(item2.name);
+                          }}
+                          style={{
+                            backgroundColor: cate.includes(item2.name)
+                              ? "#fdec"
+                              : "#fff",
+                          }}
+                        >
+                          {item2.name}
+                        </CateItem>
+                      );
+                    })}
+                </CateWrap>
+              </SubContent>
+            );
+          })}
       </Content>
       {/* Latest Order */}
       <Content>
@@ -905,7 +857,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
     { id: session.token.sub }
   );
-  // console.log("category", category.data);
+  // console.log("category", category);
   // const data = await JSON.parse(category.data);
   const copyData = [...category.data];
 
@@ -917,20 +869,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   });
   // console.log("카테고리 잘 분류도미 ?", cateSort);
-  const CCC = copyData.filter((item: CategoryTypes) => item.category === "CCC");
-  const CDC = copyData.filter((item: CategoryTypes) => item.category === "CDC");
-  const CBB = copyData.filter((item: CategoryTypes) => item.category === "CBB");
+  // const CCC = copyData.filter(
+  //   (item: CategoryTypes) => item.category === "Cake&Cookie"
+  // );
+  // const CDC = copyData.filter((item: CategoryTypes) => item.category === "CDC");
+  // const CBB = copyData.filter((item: CategoryTypes) => item.category === "CBB");
+  const Grouping: CategoryTypes[][] = [];
+  for (let i = 0; i < cateSort.length; i++) {
+    const mnfCate: CategoryTypes[] = copyData.filter(
+      (item: CategoryTypes) => item.category === cateSort[i]
+    );
+    Grouping.push(mnfCate);
+  }
 
   // console.log("겟투두", getToDo);
 
   // console.log("category +++++++", getToDo, "+++++++++++");
   return {
     props: {
-      CCC: CCC,
-      CDC: CDC,
-      CBB: CBB,
       user: session.token.sub,
-      Category: cateSort,
+      CateName: cateSort,
+      Group: Grouping,
     },
   };
 };

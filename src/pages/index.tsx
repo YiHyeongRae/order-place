@@ -420,7 +420,7 @@ export default function Home({
           </div>
         </PopupLeftBottom>
       )}
-      <AddPopupWrap>
+      {/* <AddPopupWrap>
         <AddPopupContent>
           <InputWrap style={{ gap: "8px" }}>
             <InputArea
@@ -442,7 +442,7 @@ export default function Home({
             </InputArea>
           </InputWrap>
         </AddPopupContent>
-      </AddPopupWrap>
+      </AddPopupWrap> */}
       {/* 주문완료 및 삭제 확인 팝업 */}
       {confirmState !== 0 && (
         <AddPopupWrap style={{ zIndex: 1 }}>

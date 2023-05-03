@@ -409,11 +409,13 @@ export default function Home({
       name: "",
       link: "",
       category: "",
+      user_id: user,
     },
   ]);
 
-  const submitCategory: Function = () => {
-    console.log(addCategoryItem);
+  const [addCategoryState, setAddCategoryState] = useState(false);
+  const submitCategory: Function = async () => {
+    // console.log(addCategoryItem);
 
     // 추가할 값중 빈곳이 없는지 체크
     let isReady = false;
@@ -440,10 +442,20 @@ export default function Home({
       }
       console.log("sorting", sortingCateName);
       console.log("datas", cateDatas);
+
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/addCategory",
+        {
+          data: addCategoryItem,
+        }
+      );
+
+      setAddCategoryState(false);
     } else {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
+
   return (
     <>
       {/* 최근 주문 내역 삭제 확인 팝업 */}
@@ -461,111 +473,130 @@ export default function Home({
           </div>
         </PopupLeftBottom>
       )}
-      <AddPopupWrap>
-        <AddPopupContent>
-          <InputWrap style={{ gap: "8px" }}>
-            <InputArea
-              style={{ borderBottom: "1px solid #eee", paddingBottom: "8px" }}
-            >
-              <div>Name</div>
-              <div>Link</div>
-              <div>Category</div>
-            </InputArea>
-            {addCategoryItem &&
-              addCategoryItem.map((item: any, i: number) => {
-                return (
-                  <InputArea key={i}>
-                    <TextInput
-                      type="text"
-                      placeholder="이름"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const copyNameObj = [...addCategoryItem];
-                        copyNameObj[i].name = e.currentTarget.value;
-                        setAddCategoryItem(copyNameObj);
-                      }}
-                    />
-                    <TextInput
-                      type="text"
-                      placeholder="구매 링크"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const copyLinkObj = [...addCategoryItem];
-                        copyLinkObj[i].link = e.currentTarget.value;
-                        setAddCategoryItem(copyLinkObj);
-                      }}
-                    />
-                    <select
-                      style={{
-                        border: 0,
-                        outline: "none",
-                        fontFamily: "MapleLight",
-                        fontWeight: 400,
-                      }}
-                      onChange={(e) => {
-                        if (e.currentTarget.value !== "카테고리 선택") {
-                          const copyCategoryObj = [...addCategoryItem];
-                          const indexs: any =
-                            e.currentTarget[1].getAttribute("data-index");
-                          copyCategoryObj[indexs].category =
-                            e.currentTarget.value;
-                          setAddCategoryItem(copyCategoryObj);
-                        }
-                      }}
-                    >
-                      <option
-                        value="카테고리 선택"
-                        defaultValue="카테고리 선택"
+
+      {/* 카테고리 추가 */}
+      {addCategoryState && (
+        <AddPopupWrap>
+          <AddPopupContent>
+            <InputWrap style={{ gap: "8px" }}>
+              <InputArea
+                style={{ borderBottom: "1px solid #eee", paddingBottom: "8px" }}
+              >
+                <div>Name</div>
+                <div>Link</div>
+                <div>Category</div>
+              </InputArea>
+              {addCategoryItem &&
+                addCategoryItem.map((item: any, i: number) => {
+                  return (
+                    <InputArea key={i}>
+                      <TextInput
+                        type="text"
+                        placeholder="이름"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const copyNameObj = [...addCategoryItem];
+                          copyNameObj[i].name = e.currentTarget.value;
+                          setAddCategoryItem(copyNameObj);
+                        }}
+                      />
+                      <TextInput
+                        type="text"
+                        placeholder="구매 링크"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          const copyLinkObj = [...addCategoryItem];
+                          copyLinkObj[i].link = e.currentTarget.value;
+                          setAddCategoryItem(copyLinkObj);
+                        }}
+                      />
+                      <select
+                        style={{
+                          border: 0,
+                          outline: "none",
+                          fontFamily: "MapleLight",
+                          fontWeight: 400,
+                        }}
+                        onChange={(e) => {
+                          if (e.currentTarget.value !== "카테고리 선택") {
+                            const copyCategoryObj = [...addCategoryItem];
+                            const indexs: any =
+                              e.currentTarget[1].getAttribute("data-index");
+                            copyCategoryObj[indexs].category =
+                              e.currentTarget.value;
+                            setAddCategoryItem(copyCategoryObj);
+                          }
+                        }}
                       >
-                        카테고리 선택
-                      </option>
-                      {CateName &&
-                        CateName.map((item: string, ii: number) => {
-                          return (
-                            <option key={ii} data-index={i} value={item}>
-                              {item}
-                            </option>
-                          );
-                        })}
-                    </select>
-                  </InputArea>
-                );
-              })}
+                        <option
+                          value="카테고리 선택"
+                          defaultValue="카테고리 선택"
+                        >
+                          카테고리 선택
+                        </option>
+                        {CateName &&
+                          CateName.map((item: string, ii: number) => {
+                            return (
+                              <option key={ii} data-index={i} value={item}>
+                                {item}
+                              </option>
+                            );
+                          })}
+                      </select>
+                    </InputArea>
+                  );
+                })}
 
-            <ButtonWrap style={{ border: 0 }}>
+              <ButtonWrap style={{ border: 0 }}>
+                <Buttons
+                  type="button"
+                  style={{ border: 0 }}
+                  onClick={() => {
+                    const copyAddCategoryItem = [...addCategoryItem];
+
+                    const formObj = {
+                      name: "",
+                      link: "",
+                      category: "",
+                      user_id: user,
+                    };
+
+                    copyAddCategoryItem.push(formObj);
+                    setAddCategoryItem(copyAddCategoryItem);
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    style={{ width: "20px" }}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </Buttons>
+              </ButtonWrap>
+            </InputWrap>
+            <ButtonWrap>
+              <Buttons onClick={() => submitCategory()}>Add Category</Buttons>
               <Buttons
-                type="button"
-                style={{ border: 0 }}
                 onClick={() => {
-                  const copyAddCategoryItem = [...addCategoryItem];
-
-                  const formObj = { name: "", link: "", category: "" };
-
-                  copyAddCategoryItem.push(formObj);
-                  setAddCategoryItem(copyAddCategoryItem);
+                  setAddCategoryState(false),
+                    setAddCategoryItem([
+                      { name: "", link: "", category: "", user_id: user },
+                    ]);
                 }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  style={{ width: "20px" }}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                Cancle
               </Buttons>
             </ButtonWrap>
-          </InputWrap>
-          <ButtonWrap>
-            <Buttons onClick={() => submitCategory()}>Add Category</Buttons>
-            <Buttons>Cancle</Buttons>
-          </ButtonWrap>
-        </AddPopupContent>
-      </AddPopupWrap>
+          </AddPopupContent>
+        </AddPopupWrap>
+      )}
+
       {/* 주문완료 및 삭제 확인 팝업 */}
       {confirmState !== 0 && (
         <AddPopupWrap style={{ zIndex: 1 }}>
@@ -851,6 +882,7 @@ export default function Home({
             strokeWidth={1.5}
             stroke="currentColor"
             style={{ width: "20px", cursor: "pointer" }}
+            onClick={() => setAddCategoryState(true)}
           >
             <path
               strokeLinecap="round"

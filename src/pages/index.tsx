@@ -411,9 +411,39 @@ export default function Home({
       category: "",
     },
   ]);
-  useEffect(() => {
+
+  const submitCategory: Function = () => {
     console.log(addCategoryItem);
-  });
+
+    // 추가할 값중 빈곳이 없는지 체크
+    let isReady = false;
+    for (let i = 0; i < addCategoryItem.length; i++) {
+      isReady = addCategoryItem.every(
+        (item: any) => item.name !== "" && item.category !== ""
+      );
+    }
+    if (isReady) {
+      const sortingCateName: any[] = [];
+      addCategoryItem.map((item: any) => {
+        if (!sortingCateName.includes(item.category)) {
+          sortingCateName.push(item.category);
+        }
+      });
+
+      const cateDatas = [];
+
+      for (let i = 0; i < sortingCateName.length; i++) {
+        const filtering = addCategoryItem.filter(
+          (item: any) => item.category === sortingCateName[i]
+        );
+        cateDatas.push(filtering);
+      }
+      console.log("sorting", sortingCateName);
+      console.log("datas", cateDatas);
+    } else {
+      alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
+    }
+  };
   return (
     <>
       {/* 최근 주문 내역 삭제 확인 팝업 */}
@@ -530,6 +560,10 @@ export default function Home({
               </Buttons>
             </ButtonWrap>
           </InputWrap>
+          <ButtonWrap>
+            <Buttons onClick={() => submitCategory()}>Add Category</Buttons>
+            <Buttons>Cancle</Buttons>
+          </ButtonWrap>
         </AddPopupContent>
       </AddPopupWrap>
       {/* 주문완료 및 삭제 확인 팝업 */}

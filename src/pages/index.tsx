@@ -276,7 +276,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     });
 
     const date = getTodayDate();
-
+    setLoading(true);
     const registHistory = await axios
       .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/historyToDo", {
         data: selected,
@@ -297,6 +297,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
 
         setToDo([]);
         setConfirmState(0);
+        setLoading(false);
       });
   };
   const orderDelete: Function = async () => {
@@ -304,6 +305,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
     });
+    setLoading(true);
     const deleteToDo = await axios
       .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/deleteToDo", {
         data: numbers.toString(),
@@ -315,6 +317,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
 
     setToDo([]);
     setConfirmState(0);
+    setLoading(false);
   };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
@@ -358,6 +361,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     );
 
     if (isFullField) {
+      setLoading(true);
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/addToDo",
         { data: pick }
@@ -367,9 +371,11 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       if (response.status === 200) {
         setAddToDoState(false);
         setCate([]);
+        setLoading(false);
       }
     } else {
       alert("수량 혹은 가격을 입력해주세요.");
+      setLoading(false);
     }
   };
 
@@ -400,12 +406,14 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   };
 
   const deleteLatestOrder: Function = async () => {
+    setLoading(true);
     const response = await axios.post(
       process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/deleteHistory",
       { data: latestOrder }
     );
     mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory");
     setLatestOrder([]);
+    setLoading(false);
   };
 
   const [addCategoryItem, setAddCategoryItem] = useState<any>([
@@ -444,7 +452,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         );
         cateDatas.push(filtering);
       }
-
+      setLoading(true);
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/addCategory",
         {
@@ -453,8 +461,10 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       );
       mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory");
       setAddCategoryState(false);
+      setLoading(false);
     } else {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
+      setLoading(false);
     }
   };
 

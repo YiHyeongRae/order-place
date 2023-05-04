@@ -440,8 +440,6 @@ export default function Home({
         );
         cateDatas.push(filtering);
       }
-      console.log("sorting", sortingCateName);
-      console.log("datas", cateDatas);
 
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/addCategory",
@@ -449,13 +447,13 @@ export default function Home({
           data: addCategoryItem,
         }
       );
-
+      mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory");
       setAddCategoryState(false);
     } else {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
-
+  console.log(addCategoryItem);
   return (
     <>
       {/* 최근 주문 내역 삭제 확인 팝업 */}
@@ -508,39 +506,57 @@ export default function Home({
                           setAddCategoryItem(copyLinkObj);
                         }}
                       />
-                      <select
-                        style={{
-                          border: 0,
-                          outline: "none",
-                          fontFamily: "MapleLight",
-                          fontWeight: 400,
-                        }}
-                        onChange={(e) => {
-                          if (e.currentTarget.value !== "카테고리 선택") {
-                            const copyCategoryObj = [...addCategoryItem];
-                            const indexs: any =
-                              e.currentTarget[1].getAttribute("data-index");
-                            copyCategoryObj[indexs].category =
-                              e.currentTarget.value;
-                            setAddCategoryItem(copyCategoryObj);
-                          }
-                        }}
-                      >
-                        <option
-                          value="카테고리 선택"
-                          defaultValue="카테고리 선택"
+                      {CateName.length !== 0 ? (
+                        <select
+                          style={{
+                            border: 0,
+                            outline: "none",
+                            fontFamily: "MapleLight",
+                            fontWeight: 400,
+                          }}
+                          onChange={(e) => {
+                            if (e.currentTarget.value !== "카테고리 선택") {
+                              const copyCategoryObj = [...addCategoryItem];
+                              const indexs: any =
+                                e.currentTarget[1].getAttribute("data-index");
+                              copyCategoryObj[indexs].category =
+                                e.currentTarget.value;
+                              setAddCategoryItem(copyCategoryObj);
+                            }
+                          }}
                         >
-                          카테고리 선택
-                        </option>
-                        {CateName &&
-                          CateName.map((item: string, ii: number) => {
-                            return (
-                              <option key={ii} data-index={i} value={item}>
-                                {item}
-                              </option>
-                            );
-                          })}
-                      </select>
+                          <option
+                            value="카테고리 선택"
+                            defaultValue="카테고리 선택"
+                          >
+                            카테고리 선택
+                          </option>
+                          {CateName &&
+                            CateName.map((item: string, ii: number) => {
+                              return (
+                                <option key={ii} data-index={i} value={item}>
+                                  {item}
+                                </option>
+                              );
+                            })}
+                        </select>
+                      ) : (
+                        <TextInput
+                          type="text"
+                          placeholder="카테고리"
+                          data-index={i}
+                          onChange={(e: any) => {
+                            if (e.currentTarget.value !== "카테고리 선택") {
+                              const copyCategoryObj = [...addCategoryItem];
+                              const indexs: any =
+                                e.currentTarget.getAttribute("data-index");
+                              copyCategoryObj[indexs].category =
+                                e.currentTarget.value;
+                              setAddCategoryItem(copyCategoryObj);
+                            }
+                          }}
+                        />
+                      )}
                     </InputArea>
                   );
                 })}
@@ -891,7 +907,7 @@ export default function Home({
             />
           </svg>
         </Title>
-        {Group &&
+        {Group.length !== 0 ? (
           Group.map((item: any, i: number) => {
             return (
               <SubContent key={i}>
@@ -935,7 +951,14 @@ export default function Home({
                 </CateWrap>
               </SubContent>
             );
-          })}
+          })
+        ) : (
+          <SubContent>
+            <CateWrap style={{ justifyContent: "center" }}>
+              <li>카테고리가 없습니다.카테고리를 추가해보세요 !</li>
+            </CateWrap>
+          </SubContent>
+        )}
       </Content>
       {/* Latest Order */}
       <Content>

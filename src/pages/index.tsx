@@ -229,7 +229,7 @@ interface HistroyTypes extends ToDoTypes {
 }
 export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
-
+  const [isLoading, setIsLoading] = useState(false);
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
   const toDoHandler: Function = (i: number) => {
@@ -253,13 +253,12 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
     (url) => fetcher(url, { id: user })
   );
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (toDoData !== undefined && history !== undefined) {
-      setLoading(false);
-    }
-  }, [toDoData, history]);
+  // useEffect(() => {
+  //   if (toDoData !== undefined && history !== undefined) {
+  //
+  //   }
+  // }, [toDoData, history]);
 
   const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
@@ -276,7 +275,6 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     });
 
     const date = getTodayDate();
-    setLoading(true);
     const registHistory = await axios
       .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/historyToDo", {
         data: selected,
@@ -297,11 +295,9 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
 
         setToDo([]);
         setConfirmState(0);
-        setLoading(false);
       });
   };
   const orderDelete: Function = async () => {
-    setLoading(true);
     const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
@@ -316,9 +312,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
       });
 
-    setToDo([]);
-    setConfirmState(0);
-    setLoading(false);
+    setToDo([]), setConfirmState(0), setIsLoading(false);
   };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
@@ -362,7 +356,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     );
 
     if (isFullField) {
-      setLoading(true);
+      true;
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/addToDo",
         { data: pick }
@@ -372,11 +366,9 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       if (response.status === 200) {
         setAddToDoState(false);
         setCate([]);
-        setLoading(false);
       }
     } else {
       alert("수량 혹은 가격을 입력해주세요.");
-      setLoading(false);
     }
   };
 
@@ -385,6 +377,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const [confirmState, setConfirmState] = useState(0);
 
   const confirmFunc: Function = () => {
+    setIsLoading(true);
     if (confirmState === 1) {
       orderComplete();
     } else if (confirmState === 2) {
@@ -407,14 +400,13 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   };
 
   const deleteLatestOrder: Function = async () => {
-    setLoading(true);
+    true;
     const response = await axios.post(
       process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/deleteHistory",
       { data: latestOrder }
     );
     mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory");
     setLatestOrder([]);
-    setLoading(false);
   };
 
   const [addCategoryItem, setAddCategoryItem] = useState<any>([
@@ -453,7 +445,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         );
         cateDatas.push(filtering);
       }
-      setLoading(true);
+      true;
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/addCategory",
         {
@@ -462,16 +454,14 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       );
       mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory");
       setAddCategoryState(false);
-      setLoading(false);
     } else {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
-      setLoading(false);
     }
   };
   return (
     <>
       {/* 로딩스피너 */}
-      {loading ? <LoadingSpinner blur /> : <></>}
+      {isLoading ? <LoadingSpinner blur /> : <></>}
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (

@@ -73,7 +73,7 @@ placePath=%3Fentry=pll%26from=nx%26fromNxList=true&c=15,0,0,0,dh">사랑방 [네
 <h2>주요 기능</h2>
 <ul>
 <li>
-Check 발주기한 지날 시 
+Check 발주기한 지날 시 알림
 </li>
 <li>
 Category 등록을 통한 발주 항목 관리

@@ -1,5 +1,5 @@
 <div align="center" style="display:flex ,flex-direction:column;">
-<h1>안양역 주문제작 케이크 사랑방 전용 발주 및 통계 어드민</h1>
+<h1>안양역 주문제작 케이크 사랑방 전용 발주 어드민</h1>
 
 
 <img src="https://user-images.githubusercontent.com/118327239/233266664-f611a26b-e722-418b-823a-5cdd7566f866.jpeg" alt="사랑방 포스터"/>
@@ -72,6 +72,9 @@ placePath=%3Fentry=pll%26from=nx%26fromNxList=true&c=15,0,0,0,dh">사랑방 [네
 
 <h2>주요 기능</h2>
 <ul>
+<li>
+Check 발주기한 지날 시 
+</li>
 <li>
 Category 등록을 통한 발주 항목 관리
 </li>

@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import useSWR, { useSWRConfig } from "swr";
 import Check from "../../components/Check";
+import LoadingSpinner from "../../components/LoadingSpinner";
 import { fetcher } from "../../util/fetcher";
 import getTodayDate from "../../util/getTodayDate";
 import { authOptions } from "./api/auth/[...nextauth]";
@@ -226,12 +227,7 @@ interface HistroyTypes extends ToDoTypes {
   order_date: string;
   delete_yn: string;
 }
-export default function Home({
-  user,
-  CateName,
-
-  Group,
-}: ServerSideDataTypes) {
+export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
 
   const [toDo, setToDo] = useState<number[]>([]);
@@ -257,6 +253,14 @@ export default function Home({
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
     (url) => fetcher(url, { id: user })
   );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (toDoData !== undefined && history !== undefined) {
+      setLoading(false);
+    }
+  }, [toDoData, history]);
+
   const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
@@ -453,9 +457,12 @@ export default function Home({
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
-  console.log(addCategoryItem);
+
   return (
     <>
+      {/* 로딩스피너 */}
+      {loading && <LoadingSpinner blur />}
+
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (
         <PopupLeftBottom onClick={() => deleteLatestOrder()}>

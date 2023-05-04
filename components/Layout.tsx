@@ -14,6 +14,7 @@ const LayoutWrap = styled.div`
 
 const ChildrenWrap = styled.div`
   padding: 32px 16px;
+  min-height: calc(100vh - 62px);
 `;
 interface Props extends PropsWithChildren {}
 function Layout(props: Props) {

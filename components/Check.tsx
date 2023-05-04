@@ -121,11 +121,6 @@ function Check({ data }: any) {
         );
         testObj.last_quantity = Number(item[item.length - 1].quantity);
         mnfArr.push(testObj);
-        // console.log(
-        //   "?ASD?FSA?F",
-        //   item[item.length - 1].order_date,
-        //   testObj.avg * item[item.length - 1].quantity
-        // );
 
         const lastOrder = new Date(item[item.length - 1].order_date);
         // console.log(
@@ -138,7 +133,6 @@ function Check({ data }: any) {
             lastOrder.getDate() + testObj.order_date_avg * testObj.last_quantity
           )
         );
-
         const Years = expectDate.getFullYear();
         const Months = expectDate.getMonth() + 1;
         const Days = expectDate.getDate();
@@ -148,7 +142,6 @@ function Check({ data }: any) {
         }`;
 
         testObj.order_expect_date = resultDate;
-        // console.log("이건가", resultDate);
         // testObj.expect_date =expectDate
       }
     });
@@ -221,7 +214,7 @@ function Check({ data }: any) {
                     viewBox="0 0 24 24"
                     strokeWidth={1.5}
                     stroke="currentColor"
-                    style={{ width: "20px", color: "red" }}
+                    style={{ width: "20px", color: "black" }}
                   >
                     <path
                       strokeLinecap="round"

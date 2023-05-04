@@ -301,11 +301,12 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       });
   };
   const orderDelete: Function = async () => {
+    setLoading(true);
     const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
     });
-    setLoading(true);
+
     const deleteToDo = await axios
       .post(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/deleteToDo", {
         data: numbers.toString(),
@@ -467,11 +468,10 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       setLoading(false);
     }
   };
-
   return (
     <>
       {/* 로딩스피너 */}
-      {loading && <LoadingSpinner blur />}
+      {loading ? <LoadingSpinner blur /> : <></>}
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (

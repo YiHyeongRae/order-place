@@ -300,6 +300,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       });
   };
   const orderDelete: Function = async () => {
+    setLoadingState(true);
     const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
@@ -379,7 +380,6 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const [confirmState, setConfirmState] = useState(0);
 
   const confirmFunc: Function = () => {
-    setLoadingState(true);
     if (confirmState === 1) {
       orderComplete();
     } else if (confirmState === 2) {

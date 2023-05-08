@@ -266,29 +266,27 @@ export default function Home({
   );
   const [Groups, setGroups] = useState<any>();
   const categoryMnf: Function = () => {
-    if (!categoryLoading) {
-      const copyData = [...category];
-      const cateSort: string[] = [];
-      copyData.map((item: CategoryTypes) => {
-        if (!cateSort.includes(item.category)) {
-          cateSort.push(item.category);
-        }
-      });
-      // console.log("카테고리 잘 분류도미 ?", cateSort);
-      // const CCC = copyData.filter(
-      //   (item: CategoryTypes) => item.category === "Cake&Cookie"
-      // );
-      // const CDC = copyData.filter((item: CategoryTypes) => item.category === "CDC");
-      // const CBB = copyData.filter((item: CategoryTypes) => item.category === "CBB");
-      const Grouping: CategoryTypes[][] = [];
-      for (let i = 0; i < cateSort.length; i++) {
-        const mnfCate: CategoryTypes[] = copyData.filter(
-          (item: CategoryTypes) => item.category === cateSort[i]
-        );
-        Grouping.push(mnfCate);
+    const copyData = [...category];
+    const cateSort: string[] = [];
+    copyData.map((item: CategoryTypes) => {
+      if (!cateSort.includes(item.category)) {
+        cateSort.push(item.category);
       }
-      setGroups(Grouping);
+    });
+    // console.log("카테고리 잘 분류도미 ?", cateSort);
+    // const CCC = copyData.filter(
+    //   (item: CategoryTypes) => item.category === "Cake&Cookie"
+    // );
+    // const CDC = copyData.filter((item: CategoryTypes) => item.category === "CDC");
+    // const CBB = copyData.filter((item: CategoryTypes) => item.category === "CBB");
+    const Grouping: CategoryTypes[][] = [];
+    for (let i = 0; i < cateSort.length; i++) {
+      const mnfCate: CategoryTypes[] = copyData.filter(
+        (item: CategoryTypes) => item.category === cateSort[i]
+      );
+      Grouping.push(mnfCate);
     }
+    setGroups(Grouping);
   };
   useEffect(() => {
     categoryMnf();

@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR, { preload, useSWRConfig } from "swr";
 import Check from "../../components/Check";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { fetcher } from "../../util/fetcher";
@@ -232,7 +232,7 @@ interface HistroyTypes extends ToDoTypes {
 export default function Home({
   user,
   CateName,
-  // Group,
+  Group,
   ssrCate,
 }: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
@@ -264,10 +264,8 @@ export default function Home({
     (url) => fetcher(url, { id: user }),
     { fallbackData: ssrCate }
   );
-
   const [Groups, setGroups] = useState<any>();
   const categoryMnf: Function = () => {
-    console.log(ssrCate);
     if (!categoryLoading) {
       const copyData = [...category];
       const cateSort: string[] = [];
@@ -295,6 +293,7 @@ export default function Home({
   useEffect(() => {
     categoryMnf();
   }, [category]);
+
   // useEffect(() => {
   //   if (toDoData !== undefined && history !== undefined) {
   //
@@ -1117,7 +1116,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       user: session.token.sub,
       CateName: cateSort,
-      // Group: Grouping,
+      Group: Grouping,
       ssrCate: category,
     },
   };

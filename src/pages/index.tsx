@@ -229,7 +229,6 @@ interface HistroyTypes extends ToDoTypes {
 }
 export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
-  const [isLoading, setIsLoading] = useState(false);
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
   const toDoHandler: Function = (i: number) => {
@@ -245,14 +244,17 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     }
   };
 
-  const { data: toDoData } = useSWR(
+  const { data: toDoData, isValidating: toDoLoading } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo",
     (url) => fetcher(url, { id: user })
   );
-  const { data: history } = useSWR(
+  const { data: history, isValidating: historyLoading } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
     (url) => fetcher(url, { id: user })
   );
+
+  console.log("toDoLoading", toDoLoading);
+  // console.log("historyLoading", historyLoading);
 
   // useEffect(() => {
   //   if (toDoData !== undefined && history !== undefined) {
@@ -312,7 +314,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
       });
 
-    setToDo([]), setConfirmState(0), setIsLoading(false);
+    setToDo([]), setConfirmState(0);
   };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
@@ -377,7 +379,6 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const [confirmState, setConfirmState] = useState(0);
 
   const confirmFunc: Function = () => {
-    setIsLoading(true);
     if (confirmState === 1) {
       orderComplete();
     } else if (confirmState === 2) {
@@ -458,10 +459,11 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
+
   return (
     <>
       {/* 로딩스피너 */}
-      {isLoading ? <LoadingSpinner blur /> : <></>}
+      {toDoLoading ? <LoadingSpinner blur /> : <></>}
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (

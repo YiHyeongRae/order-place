@@ -228,7 +228,6 @@ interface HistroyTypes extends ToDoTypes {
   delete_yn: string;
 }
 export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
-  const [loadingState, setLoadingState] = useState(false);
   const { mutate } = useSWRConfig();
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
@@ -261,7 +260,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   //
   //   }
   // }, [toDoData, history]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
@@ -300,6 +299,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       });
   };
   const orderDelete: Function = async () => {
+    setConfirmState(0), setIsLoading(true);
     const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
@@ -314,7 +314,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
       });
 
-    setToDo([]), setConfirmState(0);
+    setToDo([]), setIsLoading(false);
   };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
@@ -377,7 +377,6 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   // ToDo 삭제
   // ToDo 주문완료 및 HISTORY
   const [confirmState, setConfirmState] = useState(0);
-
   const confirmFunc: Function = () => {
     if (confirmState === 1) {
       orderComplete();
@@ -459,17 +458,11 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
-  console.log("toDoLoading", toDoLoading);
 
-  useEffect(() => {
-    if (!toDoLoading) {
-      setLoadingState(false);
-    }
-  }, [toDoLoading]);
   return (
     <>
       {/* 로딩스피너 */}
-      {loadingState ? <LoadingSpinner blur /> : <></>}
+      {isLoading && <LoadingSpinner blur />}
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (
@@ -641,12 +634,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
           </div>
 
           <ButtonWrap>
-            <Buttons
-              type="button"
-              onClick={() => {
-                setLoadingState(true), confirmFunc();
-              }}
-            >
+            <Buttons type="button" onClick={() => confirmFunc()}>
               확인
             </Buttons>
             <Buttons type="button" onClick={() => setConfirmState(0)}>

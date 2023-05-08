@@ -300,7 +300,6 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       });
   };
   const orderDelete: Function = async () => {
-    setLoadingState(true);
     const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
@@ -642,7 +641,12 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
           </div>
 
           <ButtonWrap>
-            <Buttons type="button" onClick={() => confirmFunc()}>
+            <Buttons
+              type="button"
+              onClick={() => {
+                setLoadingState(true), confirmFunc();
+              }}
+            >
               확인
             </Buttons>
             <Buttons type="button" onClick={() => setConfirmState(0)}>

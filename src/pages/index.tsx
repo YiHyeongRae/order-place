@@ -379,7 +379,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const [confirmState, setConfirmState] = useState(0);
 
   const confirmFunc: Function = () => {
-    setLoadingState((...loadingState) => true);
+    setLoadingState(true);
     if (confirmState === 1) {
       orderComplete();
     } else if (confirmState === 2) {

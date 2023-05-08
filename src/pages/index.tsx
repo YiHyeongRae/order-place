@@ -212,6 +212,7 @@ interface ServerSideDataTypes {
   user: string;
   CateName: string[];
   Group: any;
+  ssrCate: any;
 }
 
 interface ToDoTypes {
@@ -227,7 +228,13 @@ interface HistroyTypes extends ToDoTypes {
   order_date: string;
   delete_yn: string;
 }
-export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
+
+export default function Home({
+  user,
+  CateName,
+  // Group,
+  ssrCate,
+}: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
@@ -244,7 +251,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     }
   };
 
-  const { data: toDoData, isValidating: toDoLoading } = useSWR(
+  const { data: toDoData } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo",
     (url) => fetcher(url, { id: user })
   );
@@ -252,9 +259,41 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
     (url) => fetcher(url, { id: user })
   );
+  const { data: category, isLoading: categoryLoading } = useSWR(
+    process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
+    (url) => fetcher(url, { id: user }),
+    { fallbackData: ssrCate }
+  );
 
-  // console.log("historyLoading", historyLoading);
-
+  const [Groups, setGroups] = useState<any>();
+  const categoryMnf: Function = () => {
+    if (!categoryLoading) {
+      const copyData = [...category];
+      const cateSort: string[] = [];
+      copyData.map((item: CategoryTypes) => {
+        if (!cateSort.includes(item.category)) {
+          cateSort.push(item.category);
+        }
+      });
+      // console.log("카테고리 잘 분류도미 ?", cateSort);
+      // const CCC = copyData.filter(
+      //   (item: CategoryTypes) => item.category === "Cake&Cookie"
+      // );
+      // const CDC = copyData.filter((item: CategoryTypes) => item.category === "CDC");
+      // const CBB = copyData.filter((item: CategoryTypes) => item.category === "CBB");
+      const Grouping: CategoryTypes[][] = [];
+      for (let i = 0; i < cateSort.length; i++) {
+        const mnfCate: CategoryTypes[] = copyData.filter(
+          (item: CategoryTypes) => item.category === cateSort[i]
+        );
+        Grouping.push(mnfCate);
+      }
+      setGroups(Grouping);
+    }
+  };
+  useEffect(() => {
+    categoryMnf();
+  }, [category]);
   // useEffect(() => {
   //   if (toDoData !== undefined && history !== undefined) {
   //
@@ -265,7 +304,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
     // new Date()는 통계 + 재발주 평균일자 계산 후 안내 메세지를 위함
-
+    setConfirmState(0), setIsLoading(true);
     const selected: number[] = [];
     const numbers: string[] = [];
     toDo.map((index) => {
@@ -293,10 +332,8 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
                 process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory"
               );
           });
-
-        setToDo([]);
-        setConfirmState(0);
       });
+    setToDo([]), setIsLoading(false);
   };
   const orderDelete: Function = async () => {
     setConfirmState(0), setIsLoading(true);
@@ -353,12 +390,12 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   };
 
   const submitAddToDo: Function = async () => {
+    setAddToDoState(false), setIsLoading(true);
     const isFullField = pick.every(
       (item: PickTypes) => item.price !== "" && item.quantity !== ""
     );
 
     if (isFullField) {
-      true;
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/addToDo",
         { data: pick }
@@ -366,8 +403,10 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
 
       if (response.status === 200) {
-        setAddToDoState(false);
-        setCate([]);
+        setCate([]), setIsLoading(false);
+      } else {
+        alert("서버에 오류가 발생햇습니다.\n재시도해주세요.");
+        setIsLoading(false);
       }
     } else {
       alert("수량 혹은 가격을 입력해주세요.");
@@ -417,13 +456,14 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       user_id: user,
     },
   ]);
-
+  // console.log(category);
   const [addCategoryState, setAddCategoryState] = useState(false);
   const submitCategory: Function = async () => {
     // console.log(addCategoryItem);
 
     // 추가할 값중 빈곳이 없는지 체크
     let isReady = false;
+    setAddCategoryState(false), setIsLoading(true);
     for (let i = 0; i < addCategoryItem.length; i++) {
       isReady = addCategoryItem.every(
         (item: any) => item.name !== "" && item.category !== ""
@@ -445,7 +485,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         );
         cateDatas.push(filtering);
       }
-      true;
+
       const response = await axios.post(
         process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/addCategory",
         {
@@ -453,8 +493,9 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
         }
       );
       mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory");
-      setAddCategoryState(false);
+      setIsLoading(false);
     } else {
+      setAddCategoryState(true), setIsLoading(false);
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
@@ -915,8 +956,8 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
             />
           </svg>
         </Title>
-        {Group.length !== 0 ? (
-          Group.map((item: any, i: number) => {
+        {Groups && Groups.length !== 0 ? (
+          Groups.map((item: any, i: number) => {
             return (
               <SubContent key={i}>
                 <SubTitle>
@@ -1039,13 +1080,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-  const category = await axios.post(
+  const category = await fetcher(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
     { id: session.token.sub }
   );
   // console.log("category", category);
   // const data = await JSON.parse(category.data);
-  const copyData = [...category.data];
+  const copyData = [...category];
 
   const cateSort: string[] = [];
 
@@ -1075,7 +1116,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       user: session.token.sub,
       CateName: cateSort,
-      Group: Grouping,
+      // Group: Grouping,
+      category: category,
     },
   };
 };

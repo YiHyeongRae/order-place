@@ -1,10 +1,9 @@
 import axios from "axios";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
-import { useSession } from "next-auth/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import useSWR, { preload, useSWRConfig } from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import Check from "../../components/Check";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import { fetcher } from "../../util/fetcher";
@@ -213,6 +212,8 @@ interface ServerSideDataTypes {
   CateName: string[];
   Group: any;
   ssrCate: any;
+  ssrHist: any;
+  ssrTodo: any;
 }
 
 interface ToDoTypes {
@@ -232,8 +233,10 @@ interface HistroyTypes extends ToDoTypes {
 export default function Home({
   user,
   CateName,
-  Group,
+  // Group,
   ssrCate,
+  ssrHist,
+  ssrTodo,
 }: ServerSideDataTypes) {
   const { mutate } = useSWRConfig();
   const [toDo, setToDo] = useState<number[]>([]);
@@ -253,12 +256,19 @@ export default function Home({
 
   const { data: toDoData } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo",
-    (url) => fetcher(url, { id: user })
+    (url) => fetcher(url, { id: user }),
+    {
+      fallbackData: ssrTodo,
+    }
   );
   const { data: history } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
-    (url) => fetcher(url, { id: user })
+    (url) => fetcher(url, { id: user }),
+    {
+      fallbackData: ssrHist,
+    }
   );
+  console.log("history?", history, ssrHist);
   const { data: category, isLoading: categoryLoading } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
     (url) => fetcher(url, { id: user }),
@@ -1082,6 +1092,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
     { id: session.token.sub }
   );
+
+  const history = await fetcher(
+    process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
+    { id: session.token.sub }
+  );
+
+  const toDo = await fetcher(
+    process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo",
+    {
+      id: session.token.sub,
+    }
+  );
   // console.log("category", category);
   // const data = await JSON.parse(category.data);
   const copyData = [...category];
@@ -1114,8 +1136,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       user: session.token.sub,
       CateName: cateSort,
-      Group: Grouping,
+      // Group: Grouping,
       ssrCate: category,
+      ssrHist: history,
+      ssrTodo: toDo,
     },
   };
 };

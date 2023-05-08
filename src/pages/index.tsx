@@ -228,6 +228,7 @@ interface HistroyTypes extends ToDoTypes {
   delete_yn: string;
 }
 export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
+  const [loadingState, setLoadingState] = useState(false);
   const { mutate } = useSWRConfig();
   const [toDo, setToDo] = useState<number[]>([]);
   const [addToDoState, setAddToDoState] = useState(false);
@@ -248,12 +249,11 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo",
     (url) => fetcher(url, { id: user })
   );
-  const { data: history, isValidating: historyLoading } = useSWR(
+  const { data: history } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory",
     (url) => fetcher(url, { id: user })
   );
 
-  console.log("toDoLoading", toDoLoading);
   // console.log("historyLoading", historyLoading);
 
   // useEffect(() => {
@@ -379,6 +379,7 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
   const [confirmState, setConfirmState] = useState(0);
 
   const confirmFunc: Function = () => {
+    setLoadingState((...loadingState) => true);
     if (confirmState === 1) {
       orderComplete();
     } else if (confirmState === 2) {
@@ -459,11 +460,17 @@ export default function Home({ user, CateName, Group }: ServerSideDataTypes) {
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
+  console.log("toDoLoading", toDoLoading);
 
+  useEffect(() => {
+    if (!toDoLoading) {
+      setLoadingState(false);
+    }
+  }, [toDoLoading]);
   return (
     <>
       {/* 로딩스피너 */}
-      {toDoLoading ? <LoadingSpinner blur /> : <></>}
+      {loadingState ? <LoadingSpinner blur /> : <></>}
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (

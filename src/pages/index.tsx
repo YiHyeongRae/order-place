@@ -267,6 +267,7 @@ export default function Home({
 
   const [Groups, setGroups] = useState<any>();
   const categoryMnf: Function = () => {
+    console.log(ssrCate);
     if (!categoryLoading) {
       const copyData = [...category];
       const cateSort: string[] = [];
@@ -1117,7 +1118,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       user: session.token.sub,
       CateName: cateSort,
       // Group: Grouping,
-      category: category,
+      ssrCate: category,
     },
   };
 };

@@ -268,11 +268,13 @@ export default function Home({
       fallbackData: ssrHist,
     }
   );
-  console.log("history?", history, ssrHist);
-  const { data: category, isLoading: categoryLoading } = useSWR(
+  // console.log("history?", history, ssrHist);
+  const { data: category } = useSWR(
     process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory",
     (url) => fetcher(url, { id: user }),
-    { fallbackData: ssrCate }
+    {
+      fallbackData: ssrCate,
+    }
   );
   const [Groups, setGroups] = useState<any>();
   const categoryMnf: Function = () => {
@@ -429,6 +431,8 @@ export default function Home({
       orderComplete();
     } else if (confirmState === 2) {
       orderDelete();
+    } else if (confirmState === 3) {
+      deleteLatestOrder();
     }
   };
 
@@ -447,13 +451,13 @@ export default function Home({
   };
 
   const deleteLatestOrder: Function = async () => {
-    true;
+    setConfirmState(0), setIsLoading(true);
     const response = await axios.post(
       process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/deleteHistory",
       { data: latestOrder }
     );
     mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory");
-    setLatestOrder([]);
+    setLatestOrder([]), setIsLoading(false);
   };
 
   const [addCategoryItem, setAddCategoryItem] = useState<any>([
@@ -515,7 +519,7 @@ export default function Home({
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (
-        <PopupLeftBottom onClick={() => deleteLatestOrder()}>
+        <PopupLeftBottom onClick={() => setConfirmState(3)}>
           <div
             style={{
               backgroundColor: "#f55353",
@@ -670,16 +674,19 @@ export default function Home({
         </AddPopupWrap>
       )}
 
-      {/* 주문완료 및 삭제 확인 팝업 */}
+      {/* 주문완료 / 주문삭제 / 최근주문 삭제 확인 팝업 */}
       {confirmState !== 0 && (
         <AddPopupWrap style={{ zIndex: 1 }}>
           <Title>Confirm</Title>
           <div style={{ padding: "16px 0" }}>
-            {confirmState === 1 ? (
+            {/* {confirmState === 1 ? (
               <p>주문완료 하시겠습니까?</p>
             ) : (
               <p>할 일 목록에서 제거하시겠습니까?</p>
-            )}
+            )} */}
+            {confirmState === 1 && <p>주문완료 하시겠습니까?</p>}
+            {confirmState === 2 && <p>할 일 목록에서 제거하시겠습니까?</p>}
+            {confirmState === 3 && <p>최근 주문 내역에서 제거하시겠습니까?</p>}
           </div>
 
           <ButtonWrap>

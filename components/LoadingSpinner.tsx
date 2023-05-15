@@ -7,7 +7,8 @@ const SpinnerWrapper = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  /* background-color: rgba(0, 0, 0, 0.7); */
+  z-index: 500;
+  background-color: rgba(0, 0, 0, 0.7);
 `;
 
 const Spinner = styled.div`
@@ -39,6 +40,7 @@ const SpinnerText = styled.div`
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: #fff;
 `;
 
 interface LoadingSpinnerTypes {

@@ -5,7 +5,6 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { redirect } from "next/dist/server/api-utils";
 import Hash from "../../util/Hash";
 import { useRouter } from "next/router";
-import LoadingSpinner from "../../components/LoadingSpinner";
 
 const LoginWrap = styled.div`
   display: flex;
@@ -80,42 +79,36 @@ function Login() {
   };
   return (
     <LoginWrap>
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <>
-          <div>LOGIN</div>
-          <LoginForm>
-            <Inputs
-              type="text"
-              placeholder="ID"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setUserId(e.currentTarget.value)
-              }
-              onKeyDown={(e) => enterTheLogin(e)}
-            />
+      <div>LOGIN</div>
+      <LoginForm>
+        <Inputs
+          type="text"
+          placeholder="ID"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUserId(e.currentTarget.value)
+          }
+          onKeyDown={(e) => enterTheLogin(e)}
+        />
 
-            <Inputs
-              type="password"
-              placeholder="PASSWORD"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setUserPw(e.currentTarget.value)
-              }
-              onKeyDown={(e) => enterTheLogin(e)}
-            />
+        <Inputs
+          type="password"
+          placeholder="PASSWORD"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUserPw(e.currentTarget.value)
+          }
+          onKeyDown={(e) => enterTheLogin(e)}
+        />
 
-            <ButtonWrap>
-              <CircleButtons
-                type="button"
-                onClick={() => (userId !== "" && userPw !== "" ? login() : {})}
-              >
-                로그인
-              </CircleButtons>
-            </ButtonWrap>
-          </LoginForm>
-          <div>회원가입은 관리자에게 문의해주세요.</div>
-        </>
-      )}
+        <ButtonWrap>
+          <CircleButtons
+            type="button"
+            onClick={() => (userId !== "" && userPw !== "" ? login() : {})}
+          >
+            로그인
+          </CircleButtons>
+        </ButtonWrap>
+      </LoginForm>
+      <div>회원가입은 관리자에게 문의해주세요.</div>
     </LoginWrap>
   );
 }

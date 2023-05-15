@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import useSWR, { useSWRConfig } from "swr";
 import Check from "../../components/Check";
-import LoadingSpinner from "../../components/LoadingSpinner";
 import { fetcher } from "../../util/fetcher";
 import getTodayDate from "../../util/getTodayDate";
 import { authOptions } from "./api/auth/[...nextauth]";
@@ -511,9 +510,6 @@ export default function Home({
 
   return (
     <>
-      {/* 로딩스피너 */}
-      {/* {isLoading && <LoadingSpinner blur />} */}
-
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (
         <PopupLeftBottom onClick={() => setConfirmState(3)}>

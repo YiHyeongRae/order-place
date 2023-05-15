@@ -4,7 +4,9 @@ import Layout from "../../components/Layout";
 import "../../public/font/font.css";
 import { SessionProvider, signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import LoadingSpinner from "../../components/LoadingSpinner";
 
 export default function App({
   Component,
@@ -60,9 +62,39 @@ export default function App({
     );
   }
 
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    //axios 호출시 인터셉트
+    axios.interceptors.request.use(
+      function (config) {
+        console.log("what is config?", config.method);
+        if (config.method === "post") {
+          setLoading(true);
+        }
+
+        return config;
+      },
+      function (error) {
+        return Promise.reject(error);
+      }
+    );
+    //axios 호출 종료시 인터셉트
+    axios.interceptors.response.use(
+      function (response) {
+        setLoading(false);
+        return response;
+      },
+      function (error) {
+        setLoading(false);
+        return Promise.reject(error);
+      }
+    );
+  }, []);
   return (
     <SessionProvider session={session}>
       <Layout>
+        {loading && <LoadingSpinner blur />}
+
         <Component {...pageProps} />
       </Layout>
     </SessionProvider>

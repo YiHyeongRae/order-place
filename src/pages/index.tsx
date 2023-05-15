@@ -309,12 +309,12 @@ export default function Home({
   //
   //   }
   // }, [toDoData, history]);
-  const [isLoading, setIsLoading] = useState(false);
+
   const orderComplete: Function = async () => {
     // 선택한 대상 주문완료로 처리
     // 선택한 대상 id , new Date(), 갯수, 가격 보내기
     // new Date()는 통계 + 재발주 평균일자 계산 후 안내 메세지를 위함
-    setConfirmState(0), setIsLoading(true);
+    setConfirmState(0);
     const selected: number[] = [];
     const numbers: string[] = [];
     toDo.map((index) => {
@@ -343,10 +343,10 @@ export default function Home({
               );
           });
       });
-    setToDo([]), setIsLoading(false);
+    setToDo([]);
   };
   const orderDelete: Function = async () => {
-    setConfirmState(0), setIsLoading(true);
+    setConfirmState(0);
     const numbers: string[] = [];
     toDo.map((index) => {
       numbers.push(`"${toDoData[index].no}"`);
@@ -361,7 +361,7 @@ export default function Home({
         mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
       });
 
-    setToDo([]), setIsLoading(false);
+    setToDo([]);
   };
   const [cate, setCate] = useState<string[]>([]);
   const selectCategory: Function = (name: string) => {
@@ -400,7 +400,6 @@ export default function Home({
   };
 
   const submitAddToDo: Function = async () => {
-    setAddToDoState(false), setIsLoading(true);
     const isFullField = pick.every(
       (item: PickTypes) => item.price !== "" && item.quantity !== ""
     );
@@ -413,10 +412,9 @@ export default function Home({
       mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/todo/getToDo");
 
       if (response.status === 200) {
-        setCate([]), setIsLoading(false);
+        setCate([]), setAddToDoState(false);
       } else {
         alert("서버에 오류가 발생햇습니다.\n재시도해주세요.");
-        setIsLoading(false);
       }
     } else {
       alert("수량 혹은 가격을 입력해주세요.");
@@ -451,13 +449,13 @@ export default function Home({
   };
 
   const deleteLatestOrder: Function = async () => {
-    setConfirmState(0), setIsLoading(true);
+    setConfirmState(0);
     const response = await axios.post(
       process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/deleteHistory",
       { data: latestOrder }
     );
     mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/history/getHistory");
-    setLatestOrder([]), setIsLoading(false);
+    setLatestOrder([]);
   };
 
   const [addCategoryItem, setAddCategoryItem] = useState<any>([
@@ -475,7 +473,7 @@ export default function Home({
 
     // 추가할 값중 빈곳이 없는지 체크
     let isReady = false;
-    setAddCategoryState(false), setIsLoading(true);
+    setAddCategoryState(false);
     for (let i = 0; i < addCategoryItem.length; i++) {
       isReady = addCategoryItem.every(
         (item: any) => item.name !== "" && item.category !== ""
@@ -505,9 +503,8 @@ export default function Home({
         }
       );
       mutate(process.env.NEXT_PUBLIC_ORIGIN_HOST + "/api/category/getCategory");
-      setIsLoading(false);
     } else {
-      setAddCategoryState(true), setIsLoading(false);
+      setAddCategoryState(true);
       alert("이름,카테고리 항목을 빠짐없이 설정해주세요.");
     }
   };
@@ -515,7 +512,7 @@ export default function Home({
   return (
     <>
       {/* 로딩스피너 */}
-      {isLoading && <LoadingSpinner blur />}
+      {/* {isLoading && <LoadingSpinner blur />} */}
 
       {/* 최근 주문 내역 삭제 확인 팝업 */}
       {latestOrder.length !== 0 && (
